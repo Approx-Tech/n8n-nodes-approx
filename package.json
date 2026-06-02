@@ -1,6 +1,6 @@
 {
     "name": "@approx-tech/n8n-nodes-approx",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "description": "n8n community nodes for Approx — construction cost-estimation and quantity-takeoff automation.",
     "keywords": [
         "n8n-community-node-package",
@@ -49,8 +49,10 @@
             "dist/credentials/ApproxApi.credentials.js"
         ],
         "nodes": [
+            "dist/nodes/ApproxAuthority/ApproxAuthority.node.js",
             "dist/nodes/ApproxProject/ApproxProject.node.js",
             "dist/nodes/ApproxReport/ApproxReport.node.js",
+            "dist/nodes/ApproxTemplate/ApproxTemplate.node.js",
             "dist/nodes/ApproxUnitPrice/ApproxUnitPrice.node.js"
         ]
     },

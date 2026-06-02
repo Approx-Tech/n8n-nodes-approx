@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-06-03
+
+- **New node — Approx Authority**: full CRUD for pricing authorities (`Get Many`, `Get`, `Create`, `Update Name`, `Update Logo`, `Delete`). Backed by new `/api/integrations/authorities` endpoints gated by `integrations:authorities:read` / `integrations:authorities:write` permissions.
+- **New node — Approx Template**: query-only access to takeoff templates, report templates, and property-type trees. Resources: `Takeoff Template` (`Get Many`, `Get`), `Report Template` (`Get Many` by takeoff-template ID), `Property Type` (`Get By Takeoff Template`, `Get By Project`). Backed by new `/api/integrations/templates/*` endpoints gated by `integrations:templates:read`.
+- These nodes unblock create/update flows by letting workflows discover the GUIDs they need (Authority, Takeoff Template, Report Template, Property Type) without hand-copying them from the Approx UI.
+
 ## [0.3.0] - 2026-06-02
 
 - **Project → Create**: surface `Report Template ID`, `Carriage Percentage`, and `Expand Custom Pricings` as top-level required/standard fields instead of hiding them in “Additional Fields” (backend rejected creates without `ReportTemplateID`).
