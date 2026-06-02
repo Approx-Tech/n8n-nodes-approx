@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-06-02
+
+- **README**: drop stale "scaffold (pre-0.1.0)" banner and broken link to the internal planning doc; document the `Approx Authority` and `Approx Template` nodes added in 0.4.0; remove the obsolete `organizationId` credential field.
+
 ## [0.4.0] - 2026-06-03
 
 - **New node — Approx Authority**: full CRUD for pricing authorities (`Get Many`, `Get`, `Create`, `Update Name`, `Update Logo`, `Delete`). Backed by new `/api/integrations/authorities` endpoints gated by `integrations:authorities:read` / `integrations:authorities:write` permissions.

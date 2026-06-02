@@ -2,8 +2,6 @@
 
 n8n community nodes for [Approx](https://approx.cloud) — automate construction cost-estimation and quantity-takeoff workflows.
 
-> **Status: scaffold (pre-0.1.0).** Implementation is in progress. See [docs/N8N_NODES_APPROX_PLAN.md](../../docs/N8N_NODES_APPROX_PLAN.md) for the full plan.
-
 ## Install (self-hosted n8n)
 
 ```bash
@@ -24,7 +22,6 @@ The `ApproxApi` credential needs:
 | `clientId` | M2M application client id. |
 | `clientSecret` | M2M application client secret. |
 | `audience` | API audience. Default: `https://approx.azurewebsites.net`. |
-| `organizationId` | Auth0 organization id (e.g. `org_xxx`). |
 | `baseUrl` | Approx API base URL. Default: `https://approx.azurewebsites.net`. |
 
 ## Nodes
@@ -32,10 +29,12 @@ The `ApproxApi` credential needs:
 - **Approx Project** — projects, work-group types, properties, original/static files.
 - **Approx Report** — generate, poll, and download project reports.
 - **Approx Unit Price** — query pricing libraries and unit prices.
+- **Approx Authority** — CRUD for pricing authorities (kurumlar).
+- **Approx Template** — query takeoff templates, report templates, and property-type trees (lookup IDs needed by create operations).
 
 ## Data flow
 
-- `client_id`, `client_secret`, `audience`, `organization` → Auth0 token endpoint.
+- `client_id`, `client_secret`, `audience` → Auth0 token endpoint.
 - Bearer token + request payload → `{baseUrl}/api/integrations/...`.
 
 No data is sent anywhere else. Tokens are cached in process memory only.
