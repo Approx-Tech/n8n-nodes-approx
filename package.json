@@ -1,0 +1,77 @@
+{
+    "name": "@approx-tech/n8n-nodes-approx",
+    "version": "0.2.0",
+    "description": "n8n community nodes for Approx — construction cost-estimation and quantity-takeoff automation.",
+    "keywords": [
+        "n8n-community-node-package",
+        "n8n",
+        "approx",
+        "construction",
+        "cost-estimation",
+        "quantity-takeoff",
+        "auth0"
+    ],
+    "license": "MIT",
+    "homepage": "https://github.com/Approx-Tech/n8n-nodes-approx",
+    "author": {
+        "name": "Approx",
+        "email": "info@approx.one",
+        "url": "https://approx.one"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Approx-Tech/n8n-nodes-approx.git"
+    },
+    "bugs": {
+        "url": "https://github.com/Approx-Tech/n8n-nodes-approx/issues"
+    },
+    "engines": {
+        "node": ">=20.15"
+    },
+    "main": "index.js",
+    "scripts": {
+        "build": "tsc && gulp build:icons",
+        "dev": "tsc --watch",
+        "format": "prettier nodes credentials utils --write",
+        "lint": "eslint --ext .ts nodes credentials utils && eslint package.json",
+        "lintfix": "eslint --ext .ts nodes credentials utils --fix && eslint package.json --fix",
+        "prepublishOnly": "npm run build && npm run lint"
+    },
+    "files": [
+        "dist",
+        "credentials",
+        "nodes",
+        "utils"
+    ],
+    "n8n": {
+        "n8nNodesApiVersion": 1,
+        "credentials": [
+            "dist/credentials/ApproxApi.credentials.js"
+        ],
+        "nodes": [
+            "dist/nodes/ApproxProject/ApproxProject.node.js",
+            "dist/nodes/ApproxReport/ApproxReport.node.js",
+            "dist/nodes/ApproxUnitPrice/ApproxUnitPrice.node.js"
+        ]
+    },
+    "peerDependencies": {
+        "n8n-workflow": "*"
+    },
+    "devDependencies": {
+        "@types/node": "^20.14.0",
+        "@typescript-eslint/eslint-plugin": "^7.18.0",
+        "@typescript-eslint/parser": "^7.18.0",
+        "eslint": "^8.57.0",
+        "eslint-plugin-n8n-nodes-base": "^1.16.3",
+        "gulp": "^4.0.2",
+        "gulp-rename": "^2.0.0",
+        "jsonc-eslint-parser": "^3.1.0",
+        "n8n-workflow": "*",
+        "prettier": "^3.3.0",
+        "typescript": "^5.4.5"
+    },
+    "publishConfig": {
+        "access": "public",
+        "provenance": true
+    }
+}

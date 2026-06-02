@@ -1,0 +1,10 @@
+*
+
+!dist/**/*
+!package.json
+!README.md
+!LICENSE
+!CHANGELOG.md
+
+dist/**/*.map
+dist/**/*.tsbuildinfo
