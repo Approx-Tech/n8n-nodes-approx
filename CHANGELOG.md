@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-06-02
+
+- **Chore**: version bump to publish the 0.5.0 changes (consolidated `Approx` node and built-in OAuth2 credential) — the 0.5.0 commit landed on `main` without a follow-up release. No functional changes since 0.5.0.
+
 ## [0.5.0] - 2026-06-02
 
 ### ⚠ Breaking changes (community-verification fixes)
