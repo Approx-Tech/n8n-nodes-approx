@@ -2,7 +2,7 @@
 
 [![npm version](https://img.shields.io/npm/v/@approx-tech/n8n-nodes-approx.svg)](https://www.npmjs.com/package/@approx-tech/n8n-nodes-approx)
 
-n8n community node for [Approx](https://approx.cloud) — automate construction
+n8n community node for [Approx](https://approx.one) — automate construction
 cost-estimation and quantity-takeoff workflows.
 
 > **Heads-up — breaking change in 0.5.0:** the five previous nodes
@@ -380,4 +380,4 @@ values, then re-pick it on each `Approx` node.
 ## Support
 
 - Issues: <https://github.com/Approx-Tech/n8n-nodes-approx/issues>
-- Approx product: <https://approx.cloud>
+- Approx product: <https://approx.one>
