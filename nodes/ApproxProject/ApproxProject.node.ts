@@ -91,18 +91,69 @@ export class ApproxProject implements INodeType {
                 description: 'Takeoff template ID to apply to the project',
             },
             {
-                displayName: 'Additional Fields',
-                name: 'additionalFields',
-                type: 'collection',
-                placeholder: 'Add Field',
-                default: {},
-                displayOptions: { show: { resource: ['project'], operation: ['create', 'update'] } },
-                options: [
-                    { displayName: 'Carriage Percentage', name: 'carriagePercentage', type: 'number', default: 0, description: 'Carriage (ötürülük) percentage' },
-                    { displayName: 'Expand Custom Pricings', name: 'expandCustomPricings', type: 'boolean', default: false, description: 'Whether to expand custom pricings into rows' },
-                    { displayName: 'Project Name', name: 'projectName', type: 'string', default: '', description: 'New project name (update only)' },
-                    { displayName: 'Report Template ID', name: 'reportTemplateId', type: 'string', default: '', description: 'Report template ID to assign' },
-                ],
+                displayName: 'Report Template ID',
+                name: 'reportTemplateId',
+                type: 'string',
+                required: true,
+                default: '',
+                displayOptions: { show: { resource: ['project'], operation: ['create'] } },
+                description: 'Report template ID to assign to the project',
+            },
+            {
+                displayName: 'Carriage Percentage',
+                name: 'carriagePercentage',
+                type: 'number',
+                required: true,
+                typeOptions: { minValue: 0, maxValue: 1, numberPrecision: 4 },
+                default: 0,
+                displayOptions: { show: { resource: ['project'], operation: ['create'] } },
+                description: 'Carriage (nakliye) percentage between 0 and 1 (e.g. 0.04 = 4%)',
+            },
+            {
+                displayName: 'Expand Custom Pricings',
+                name: 'expandCustomPricings',
+                type: 'boolean',
+                default: false,
+                displayOptions: { show: { resource: ['project'], operation: ['create'] } },
+                description: 'Whether to expand custom pricings into individual rows',
+            },
+
+            // ---------- Project Update ----------
+            {
+                displayName: 'Project Name',
+                name: 'projectName',
+                type: 'string',
+                required: true,
+                default: '',
+                displayOptions: { show: { resource: ['project'], operation: ['update'] } },
+                description: 'New project name',
+            },
+            {
+                displayName: 'Report Template ID',
+                name: 'reportTemplateId',
+                type: 'string',
+                required: true,
+                default: '',
+                displayOptions: { show: { resource: ['project'], operation: ['update'] } },
+                description: 'Report template ID to assign to the project',
+            },
+            {
+                displayName: 'Carriage Percentage',
+                name: 'carriagePercentage',
+                type: 'number',
+                required: true,
+                typeOptions: { minValue: 0, maxValue: 1, numberPrecision: 4 },
+                default: 0,
+                displayOptions: { show: { resource: ['project'], operation: ['update'] } },
+                description: 'Carriage (nakliye) percentage between 0 and 1',
+            },
+            {
+                displayName: 'Expand Custom Pricings',
+                name: 'expandCustomPricings',
+                type: 'boolean',
+                default: false,
+                displayOptions: { show: { resource: ['project'], operation: ['update'] } },
+                description: 'Whether to expand custom pricings into individual rows',
             },
             {
                 displayName: 'Query Options',
@@ -178,36 +229,29 @@ export class ApproxProject implements INodeType {
 
             },
             {
+                displayName: 'Property (JSON)',
+                name: 'propertyJson',
+                type: 'json',
+                required: true,
+                default: '{\n  "propertyTypeId": "",\n  "name": ""\n}',
+                displayOptions: { show: { resource: ['property'], operation: ['create'] } },
+                description: 'Property payload. Shape is defined by the project’s takeoff template (Excel import schema). Minimum keys: propertyTypeId, name. Use the Template Manager to discover the exact columns for your template.',
+            },
+            {
                 displayName: 'Name',
                 name: 'name',
                 type: 'string',
                 required: true,
                 default: '',
-                displayOptions: { show: { resource: ['property'], operation: ['create', 'updateName'] } },
-                description: 'Property name',
-            },
-            {
-                displayName: 'Property Type ID',
-                name: 'propertyTypeId',
-                type: 'string',
-                required: true,
-                default: '',
-                displayOptions: { show: { resource: ['property'], operation: ['create'] } },
-
-            },
-            {
-                displayName: 'Parent Property ID',
-                name: 'parentPropertyId',
-                type: 'string',
-                default: '',
-                displayOptions: { show: { resource: ['property'], operation: ['create'] } },
-                description: 'Optional parent property ID (for nested properties)',
+                displayOptions: { show: { resource: ['property'], operation: ['updateName'] } },
+                description: 'New property name',
             },
             {
                 displayName: 'Multiplier',
                 name: 'multiplier',
                 type: 'number',
                 required: true,
+                typeOptions: { minValue: 1 },
                 default: 1,
                 displayOptions: { show: { resource: ['property'], operation: ['updateMultiplier'] } },
                 description: 'Multiplier value (must be greater than 0)',
@@ -217,9 +261,9 @@ export class ApproxProject implements INodeType {
                 name: 'propertiesJson',
                 type: 'json',
                 required: true,
-                default: '[]',
+                default: '[\n  {\n    "propertyTypeId": "",\n    "name": "",\n    "code": ""\n  }\n]',
                 displayOptions: { show: { resource: ['property'], operation: ['createMany'] } },
-                description: 'Array of property objects: { name, propertyTypeId, parentPropertyId? }',
+                description: 'Array of property objects. Required keys per item: propertyTypeId. Optional: name, code.',
             },
             {
                 displayName: 'Query Options',
@@ -362,19 +406,25 @@ export class ApproxProject implements INodeType {
                         const res = await approxApiRequest.call(this, 'GET', `/api/integrations/projects/${id}`);
                         returnData.push({ json: res });
                     } else if (operation === 'create') {
-                        const additional = this.getNodeParameter('additionalFields', i, {}) as any;
                         const body = {
                             projectName: this.getNodeParameter('projectName', i) as string,
                             authorityId: this.getNodeParameter('authorityId', i) as string,
                             takeoffTemplateId: this.getNodeParameter('takeoffTemplateId', i) as string,
-                            ...additional,
+                            reportTemplateId: this.getNodeParameter('reportTemplateId', i) as string,
+                            carriagePercentage: this.getNodeParameter('carriagePercentage', i) as number,
+                            expandCustomPricings: this.getNodeParameter('expandCustomPricings', i, false) as boolean,
                         };
                         const res = await approxApiRequest.call(this, 'POST', '/api/integrations/projects', body);
                         returnData.push({ json: res });
                     } else if (operation === 'update') {
                         const id = this.getNodeParameter('projectId', i) as string;
-                        const additional = this.getNodeParameter('additionalFields', i, {}) as any;
-                        const res = await approxApiRequest.call(this, 'PUT', `/api/integrations/projects/${id}`, additional);
+                        const body = {
+                            projectName: this.getNodeParameter('projectName', i) as string,
+                            reportTemplateId: this.getNodeParameter('reportTemplateId', i) as string,
+                            carriagePercentage: this.getNodeParameter('carriagePercentage', i) as number,
+                            expandCustomPricings: this.getNodeParameter('expandCustomPricings', i, false) as boolean,
+                        };
+                        const res = await approxApiRequest.call(this, 'PUT', `/api/integrations/projects/${id}`, body);
                         returnData.push({ json: res ?? { success: true } });
                     } else if (operation === 'delete') {
                         const id = this.getNodeParameter('projectId', i) as string;
@@ -399,13 +449,10 @@ export class ApproxProject implements INodeType {
                         const res = await approxApiRequest.call(this, 'GET', `${base}/${pid}`);
                         returnData.push({ json: res });
                     } else if (operation === 'create') {
-                        const body = {
-                            name: this.getNodeParameter('name', i) as string,
-                            propertyTypeId: this.getNodeParameter('propertyTypeId', i) as string,
-                            parentPropertyId: (this.getNodeParameter('parentPropertyId', i, '') as string) || null,
-                        };
-                        const res = await approxApiRequest.call(this, 'POST', base, body);
-                        returnData.push({ json: res });
+                        const raw = this.getNodeParameter('propertyJson', i) as string | object;
+                        const property = typeof raw === 'string' ? JSON.parse(raw) : raw;
+                        const res = await approxApiRequest.call(this, 'POST', base, { property });
+                        returnData.push({ json: res ?? { success: true } });
                     } else if (operation === 'createMany') {
                         const raw = this.getNodeParameter('propertiesJson', i) as string | object;
                         const properties = typeof raw === 'string' ? JSON.parse(raw) : raw;

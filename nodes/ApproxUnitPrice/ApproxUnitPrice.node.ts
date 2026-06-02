@@ -64,6 +64,26 @@ export class ApproxUnitPrice implements INodeType {
                 description: 'Pricing library ID',
             },
             {
+                displayName: 'Valid From',
+                name: 'validFrom',
+                type: 'string',
+                required: true,
+                default: '',
+                placeholder: 'YYYY-MM-DD',
+                displayOptions: { show: { resource: ['pricing'] } },
+                description: 'Lower bound (inclusive) of the pricing validity window. Format: YYYY-MM-DD.',
+            },
+            {
+                displayName: 'Valid To',
+                name: 'validTo',
+                type: 'string',
+                required: true,
+                default: '',
+                placeholder: 'YYYY-MM-DD',
+                displayOptions: { show: { resource: ['pricing'] } },
+                description: 'Upper bound (inclusive) of the pricing validity window. Format: YYYY-MM-DD.',
+            },
+            {
                 displayName: 'Query Options',
                 name: 'queryOptions',
                 type: 'collection',
@@ -73,8 +93,6 @@ export class ApproxUnitPrice implements INodeType {
                     { displayName: 'Order By', name: 'orderBy', type: 'string', default: '', placeholder: 'name asc', description: 'DQB order-by expression' },
                     { displayName: 'Skip', name: 'skip', type: 'number', default: 0 },
                     { displayName: 'Take', name: 'take', type: 'number', default: 50, description: 'Items per page (max 200)' },
-                    { displayName: 'Valid From', name: 'validFrom', type: 'dateTime', default: '', description: 'Filter pricings by valid-from date (pricing resource only)' },
-                    { displayName: 'Valid To', name: 'validTo', type: 'dateTime', default: '', description: 'Filter pricings by valid-to date (pricing resource only)' },
                     { displayName: 'Where', name: 'where', type: 'string', default: '', placeholder: 'name|Contains|foo', description: 'DQB where expression' },
                 ],
             },
@@ -97,8 +115,8 @@ export class ApproxUnitPrice implements INodeType {
                 } else {
                     const libraryId = this.getNodeParameter('libraryId', i) as string;
                     endpoint = `/api/integrations/pricing/libraries/${libraryId}/pricings`;
-                    if (options.validFrom) qs.validFrom = options.validFrom;
-                    if (options.validTo) qs.validTo = options.validTo;
+                    qs.validFrom = this.getNodeParameter('validFrom', i) as string;
+                    qs.validTo = this.getNodeParameter('validTo', i) as string;
                 }
 
                 const res = await approxApiRequest.call(this, 'GET', endpoint, undefined, qs);

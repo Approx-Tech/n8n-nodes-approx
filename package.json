@@ -1,6 +1,6 @@
 {
     "name": "@approx-tech/n8n-nodes-approx",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "description": "n8n community nodes for Approx — construction cost-estimation and quantity-takeoff automation.",
     "keywords": [
         "n8n-community-node-package",

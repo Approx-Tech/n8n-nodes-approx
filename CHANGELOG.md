@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-06-02
+
+- **Project → Create**: surface `Report Template ID`, `Carriage Percentage`, and `Expand Custom Pricings` as top-level required/standard fields instead of hiding them in “Additional Fields” (backend rejected creates without `ReportTemplateID`).
+- **Project → Update**: replace the “Additional Fields” collection with explicit fields (`Project Name`, `Report Template ID`, `Carriage Percentage` are required; `Expand Custom Pricings` optional) to match `UpdateProjectCommandValidator`.
+- **Property → Create**: take a `Property (JSON)` body that maps to the project’s takeoff-template Excel schema; fixes the request body shape (`{ property: { ... } }`) the backend expects.
+- **Property → Create Many**: corrected the JSON template hint (`propertyTypeId` required; optional `name`, `code`; removed obsolete `parentPropertyId`).
+- **Property → Update Multiplier**: enforce `minValue: 1` in the UI.
+- **Unit Price → Pricing → Get Many**: promote `Valid From` and `Valid To` (YYYY-MM-DD) to required top-level fields (the backend route binds them as non-nullable `DateOnly`).
+
 ## [0.2.0] - 2026-06-02
 
 - Move package to its own dedicated repository: `Approx-Tech/n8n-nodes-approx`.
