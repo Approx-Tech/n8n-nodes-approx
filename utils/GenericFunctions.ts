@@ -38,7 +38,7 @@ export async function approxApiRequest(
     qs: IDataObject = {},
     extraOptions: Partial<IHttpRequestOptions> = {},
 ): Promise<any> {
-    const credentials = (await this.getCredentials('approxApi')) as unknown as ApproxCredentials;
+    const credentials = (await this.getCredentials('approxOAuth2Api')) as unknown as ApproxCredentials;
 
     const options: IHttpRequestOptions = {
         method,
@@ -53,7 +53,7 @@ export async function approxApiRequest(
     }
 
     try {
-        return await this.helpers.httpRequestWithAuthentication.call(this, 'approxApi', options);
+        return await this.helpers.httpRequestWithAuthentication.call(this, 'approxOAuth2Api', options);
     } catch (error) {
         const message = buildErrorMessage((error as { response?: { body?: unknown } }).response?.body);
         if (message) {
