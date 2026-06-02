@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-06-02
+
+### ⚠ Breaking changes (community-verification fixes)
+
+- **Consolidated 5 nodes into a single `Approx` node**. The previous `Approx Project`, `Approx Report`, `Approx Unit Price`, `Approx Authority` and `Approx Template` nodes are removed. Every former node is now a `Resource` on the new node (`Project`, `Property`, `Work Group Type`, `Original File`, `Static File`, `File`, `Report`, `Pricing`, `Pricing Library`, `Authority`, `Takeoff Template`, `Report Template`, `Property Type`). Operation and parameter names are unchanged, so values can be copied straight across — but you must replace each old node with the new `Approx` node in existing workflows. This satisfies the n8n community guideline of one regular node per package.
+- **Credential rewritten on top of n8n's built-in OAuth2.** The custom `ApproxApi` credential (which manually POSTed to `/oauth/token` from `preAuthentication` and stored an `accessToken` in a hidden field) has been replaced by `ApproxOAuth2Api` (internal name `approxOAuth2Api`) which `extends ['oAuth2Api']` with `grantType: 'clientCredentials'`. The Auth0 `audience` is injected into the token-request body via the standard `additionalBodyProperties` hidden field. n8n now handles fetching, caching and refreshing the bearer token — there is no token code in this package. **Recreate the credential** with the same `Client ID`, `Client Secret`, `Auth0 Domain`, `Audience` and `Base URL` values, then re-pick it on each `Approx` node.
+
+### Documentation
+
+- **README**: rewritten with a Resources/Operations table, a complete usage example (Manual Trigger → list projects → queue report → wait → download ZIP), an importable workflow JSON snippet, sample success outputs for the most common operations, and a "Migrating from 0.4.x" section.
+
 ## [0.4.1] - 2026-06-02
 
 - **README**: drop stale "scaffold (pre-0.1.0)" banner and broken link to the internal planning doc; document the `Approx Authority` and `Approx Template` nodes added in 0.4.0; remove the obsolete `organizationId` credential field.
