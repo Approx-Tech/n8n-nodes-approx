@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Fixed
+
+- **Removed Turkish glossary terms from node UI descriptions.** The `Resource` selector options (`Authority`, `Property`, `Takeoff Template`) and the `Carriage Percentage` parameters on `Project → Create/Update` no longer include parenthetical Turkish words (`kurumlar`, `mahaller`, `metraj`, `nakliye`). Descriptions are now English-only, per the n8n community-node guideline.
+
 ## [0.5.0] - 2026-06-02
 
 ### ⚠ Breaking changes (community-verification fixes)
