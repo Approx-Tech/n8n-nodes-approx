@@ -6,11 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
-## [0.5.1] - 2026-06-03
+## [0.6.0] - 2026-08-13
 
-### Fixed
+### ⚠ Breaking changes
 
-- **Removed Turkish glossary terms from node UI descriptions.** The `Resource` selector options (`Authority`, `Property`, `Takeoff Template`) and the `Carriage Percentage` parameters on `Project → Create/Update` no longer include parenthetical Turkish words (`kurumlar`, `mahaller`, `metraj`, `nakliye`). Descriptions are now English-only, per the n8n community-node guideline.
+- **Report endpoints renamed on the Approx backend.** The `Report` resource now calls `/api/integrations/takeoff-reports` (create / get / download), and the `Report Template` resource now calls `/api/integrations/templates/takeoff/{id}/takeoff-report-templates`. This matches the backend renaming its report domain to `TakeoffReport*`. Node `Resource`/`Operation` values are unchanged, so existing workflows continue to work after upgrading — **but this version requires the updated Approx backend** (older backends still expose the old `/reports` paths).
 
 ## [0.5.0] - 2026-06-02
 
