@@ -936,11 +936,11 @@ export class Approx implements INodeType {
                 } else if (resource === 'report') {
                     if (operation === 'create') {
                         const projectId = this.getNodeParameter('projectId', i) as string;
-                        const res = await approxApiRequest.call(this, 'POST', '/api/integrations/reports', { projectId });
+                        const res = await approxApiRequest.call(this, 'POST', '/api/integrations/takeoff-reports', { projectId });
                         returnData.push({ json: res });
                     } else if (operation === 'get') {
                         const id = this.getNodeParameter('reportId', i) as string;
-                        const res = await approxApiRequest.call(this, 'GET', `/api/integrations/reports/${id}`);
+                        const res = await approxApiRequest.call(this, 'GET', `/api/integrations/takeoff-reports/${id}`);
                         returnData.push({ json: res });
                     } else if (operation === 'download') {
                         const id = this.getNodeParameter('reportId', i) as string;
@@ -948,7 +948,7 @@ export class Approx implements INodeType {
                         const response = (await approxApiRequest.call(
                             this,
                             'GET',
-                            `/api/integrations/reports/${id}/download`,
+                            `/api/integrations/takeoff-reports/${id}/download`,
                             undefined,
                             {},
                             { encoding: 'arraybuffer', json: false, returnFullResponse: true },
@@ -963,7 +963,7 @@ export class Approx implements INodeType {
                 // ---------- Report Template ----------
                 } else if (resource === 'reportTemplate' && operation === 'getMany') {
                     const id = this.getNodeParameter('takeoffTemplateId', i) as string;
-                    const res = await approxApiRequest.call(this, 'GET', `/api/integrations/templates/takeoff/${id}/report-templates`);
+                    const res = await approxApiRequest.call(this, 'GET', `/api/integrations/templates/takeoff/${id}/takeoff-report-templates`);
                     const { items: rows } = unwrapList(res);
                     returnData.push(...rows.map((json) => ({ json })));
 

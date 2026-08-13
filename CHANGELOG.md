@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-08-13
+
+### ⚠ Breaking changes
+
+- **Report endpoints renamed on the Approx backend.** The `Report` resource now calls `/api/integrations/takeoff-reports` (create / get / download), and the `Report Template` resource now calls `/api/integrations/templates/takeoff/{id}/takeoff-report-templates`. This matches the backend renaming its report domain to `TakeoffReport*`. Node `Resource`/`Operation` values are unchanged, so existing workflows continue to work after upgrading — **but this version requires the updated Approx backend** (older backends still expose the old `/reports` paths).
+
 ## [0.5.0] - 2026-06-02
 
 ### ⚠ Breaking changes (community-verification fixes)
