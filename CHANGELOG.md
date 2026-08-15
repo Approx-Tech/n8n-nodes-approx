@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-08-15
+
+### Fixed (community-verification / lint compliance)
+
+- **`pairedItem` on all outputs.** Every returned `INodeExecutionData` object now includes `pairedItem: { item: i }` so n8n can link output items to their source input items, keeping expression references working in downstream nodes.
+- **Credential icon.** `ApproxOAuth2Api` now declares an `icon` (new `credentials/approx.svg`, copied to `dist` via gulp), satisfying the requirement that every credential class define an icon.
+- **`usableAsTool`.** The `Approx` node now sets `usableAsTool: true`, enabling it for use as an AI tool.
+- **Error wrapping.** Raw re-thrown errors are now wrapped in `NodeApiError` so n8n formats API errors correctly in the UI.
+- **Themed icons.** Node and credential icons use the `{ light, dark }` form to render correctly on both themes.
+
+### Tooling
+
+- Added a `scan` script (`npx @n8n/node-cli lint`) and wired it into `prepublishOnly` to catch the newer `@n8n/community-nodes` lint rules before publishing.
+
 ## [0.6.0] - 2026-08-13
 
 ### ⚠ Breaking changes
