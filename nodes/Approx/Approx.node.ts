@@ -3,6 +3,8 @@ import {
     INodeExecutionData,
     INodeType,
     INodeTypeDescription,
+    JsonObject,
+    NodeApiError,
     NodeOperationError,
 } from 'n8n-workflow';
 
@@ -12,9 +14,10 @@ export class Approx implements INodeType {
     description: INodeTypeDescription = {
         displayName: 'Approx',
         name: 'approx',
-        icon: 'file:approx.svg',
+        icon: { light: 'file:approx.svg', dark: 'file:approx.svg' },
         group: ['transform'],
         version: 1,
+        usableAsTool: true,
         subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
         description: 'Automate Approx construction cost-estimation and quantity-takeoff workflows.',
         defaults: { name: 'Approx' },
@@ -709,35 +712,35 @@ export class Approx implements INodeType {
                     if (operation === 'getMany') {
                         const res = await approxApiRequest.call(this, 'GET', '/api/integrations/authorities');
                         const { items: rows } = unwrapList(res);
-                        returnData.push(...rows.map((json) => ({ json })));
+                        returnData.push(...rows.map((json) => ({ json, pairedItem: { item: i } })));
                     } else if (operation === 'get') {
                         const id = this.getNodeParameter('authorityId', i) as string;
                         const res = await approxApiRequest.call(this, 'GET', `/api/integrations/authorities/${id}`);
-                        returnData.push({ json: res });
+                        returnData.push({ json: res, pairedItem: { item: i } });
                     } else if (operation === 'create') {
                         const body = {
                             name: this.getNodeParameter('name', i) as string,
                             base64Logo: this.getNodeParameter('base64Logo', i, '') as string,
                         };
                         await approxApiRequest.call(this, 'POST', '/api/integrations/authorities', body);
-                        returnData.push({ json: { success: true, ...body } });
+                        returnData.push({ json: { success: true, ...body }, pairedItem: { item: i } });
                     } else if (operation === 'updateName') {
                         const id = this.getNodeParameter('authorityId', i) as string;
                         const name = this.getNodeParameter('name', i) as string;
                         await approxApiRequest.call(this, 'PUT', `/api/integrations/authorities/${id}/name`, { name });
-                        returnData.push({ json: { success: true, authorityId: id, name } });
+                        returnData.push({ json: { success: true, authorityId: id, name }, pairedItem: { item: i } });
                     } else if (operation === 'updateLogo') {
                         const id = this.getNodeParameter('authorityId', i) as string;
                         const base64Logo = this.getNodeParameter('base64Logo', i) as string;
                         await approxApiRequest.call(this, 'PUT', `/api/integrations/authorities/${id}/logo`, { base64Logo });
-                        returnData.push({ json: { success: true, authorityId: id } });
+                        returnData.push({ json: { success: true, authorityId: id }, pairedItem: { item: i } });
                     } else if (operation === 'delete') {
                         const id = this.getNodeParameter('authorityId', i) as string;
                         await approxApiRequest.call(this, 'DELETE', `/api/integrations/authorities/${id}`);
-                        returnData.push({ json: { success: true, authorityId: id } });
+                        returnData.push({ json: { success: true, authorityId: id }, pairedItem: { item: i } });
                     }
 
-                // ---------- File (download) ----------
+                    // ---------- File (download) ----------
                 } else if (resource === 'file' && operation === 'download') {
                     const blobId = this.getNodeParameter('blobId', i) as string;
                     const binaryPropertyName = this.getNodeParameter('binaryPropertyName', i) as string;
@@ -756,9 +759,9 @@ export class Approx implements INodeType {
                     const captured = match?.[1];
                     const filename = captured ? decodeURIComponent(captured.replace(/"$/, '')) : blobId;
                     const binaryData = await this.helpers.prepareBinaryData(buffer, filename, contentType);
-                    returnData.push({ json: { blobId, filename, mimeType: contentType }, binary: { [binaryPropertyName]: binaryData } });
+                    returnData.push({ json: { blobId, filename, mimeType: contentType }, binary: { [binaryPropertyName]: binaryData }, pairedItem: { item: i } });
 
-                // ---------- Original File / Static File ----------
+                    // ---------- Original File / Static File ----------
                 } else if (resource === 'originalFile' || resource === 'staticFile') {
                     const projectId = this.getNodeParameter('projectId', i) as string;
                     const workGroupTypeId = this.getNodeParameter('workGroupTypeId', i) as string;
@@ -772,11 +775,11 @@ export class Approx implements INodeType {
                         }
                         const res = await approxApiRequest.call(this, 'GET', base, undefined, qs);
                         const { items: rows } = unwrapList(res);
-                        returnData.push(...rows.map((json) => ({ json })));
+                        returnData.push(...rows.map((json) => ({ json, pairedItem: { item: i } })));
                     } else if (operation === 'delete') {
                         const id = this.getNodeParameter('fileId', i) as string;
                         await approxApiRequest.call(this, 'DELETE', `${base}/${id}`);
-                        returnData.push({ json: { success: true, id } });
+                        returnData.push({ json: { success: true, id }, pairedItem: { item: i } });
                     } else if (operation === 'uploadMany') {
                         const names = (this.getNodeParameter('binaryPropertyNames', i) as string)
                             .split(',')
@@ -817,17 +820,17 @@ export class Approx implements INodeType {
                             {},
                             { body: formData as any, json: false, headers: { Accept: 'application/json' } },
                         );
-                        returnData.push({ json: { success: true, count: files.length, response: res ?? null } });
+                        returnData.push({ json: { success: true, count: files.length, response: res ?? null }, pairedItem: { item: i } });
                     }
 
-                // ---------- Pricing Library ----------
+                    // ---------- Pricing Library ----------
                 } else if (resource === 'pricingLibrary') {
                     const qs = buildDqbQuery(this.getNodeParameter('queryOptions', i, {}) as any);
                     const res = await approxApiRequest.call(this, 'GET', '/api/integrations/pricing/libraries', undefined, qs);
                     const { items: rows } = unwrapList(res);
-                    returnData.push(...rows.map((json) => ({ json })));
+                    returnData.push(...rows.map((json) => ({ json, pairedItem: { item: i } })));
 
-                // ---------- Pricing ----------
+                    // ---------- Pricing ----------
                 } else if (resource === 'pricing') {
                     const libraryId = this.getNodeParameter('libraryId', i) as string;
                     const qs = buildDqbQuery(this.getNodeParameter('queryOptions', i, {}) as any);
@@ -841,19 +844,19 @@ export class Approx implements INodeType {
                         qs,
                     );
                     const { items: rows } = unwrapList(res);
-                    returnData.push(...rows.map((json) => ({ json })));
+                    returnData.push(...rows.map((json) => ({ json, pairedItem: { item: i } })));
 
-                // ---------- Project ----------
+                    // ---------- Project ----------
                 } else if (resource === 'project') {
                     if (operation === 'getMany') {
                         const qs = buildDqbQuery(this.getNodeParameter('queryOptions', i, {}) as any);
                         const res = await approxApiRequest.call(this, 'GET', '/api/integrations/projects', undefined, qs);
                         const { items: rows } = unwrapList(res);
-                        returnData.push(...rows.map((json) => ({ json })));
+                        returnData.push(...rows.map((json) => ({ json, pairedItem: { item: i } })));
                     } else if (operation === 'get') {
                         const id = this.getNodeParameter('projectId', i) as string;
                         const res = await approxApiRequest.call(this, 'GET', `/api/integrations/projects/${id}`);
-                        returnData.push({ json: res });
+                        returnData.push({ json: res, pairedItem: { item: i } });
                     } else if (operation === 'create') {
                         const body = {
                             projectName: this.getNodeParameter('projectName', i) as string,
@@ -864,7 +867,7 @@ export class Approx implements INodeType {
                             expandCustomPricings: this.getNodeParameter('expandCustomPricings', i, false) as boolean,
                         };
                         const res = await approxApiRequest.call(this, 'POST', '/api/integrations/projects', body);
-                        returnData.push({ json: res });
+                        returnData.push({ json: res, pairedItem: { item: i } });
                     } else if (operation === 'update') {
                         const id = this.getNodeParameter('projectId', i) as string;
                         const body = {
@@ -874,14 +877,14 @@ export class Approx implements INodeType {
                             expandCustomPricings: this.getNodeParameter('expandCustomPricings', i, false) as boolean,
                         };
                         const res = await approxApiRequest.call(this, 'PUT', `/api/integrations/projects/${id}`, body);
-                        returnData.push({ json: res ?? { success: true } });
+                        returnData.push({ json: res ?? { success: true }, pairedItem: { item: i } });
                     } else if (operation === 'delete') {
                         const id = this.getNodeParameter('projectId', i) as string;
                         await approxApiRequest.call(this, 'DELETE', `/api/integrations/projects/${id}`);
-                        returnData.push({ json: { success: true, id } });
+                        returnData.push({ json: { success: true, id }, pairedItem: { item: i } });
                     }
 
-                // ---------- Property ----------
+                    // ---------- Property ----------
                 } else if (resource === 'property') {
                     const projectId = this.getNodeParameter('projectId', i) as string;
                     const base = `/api/integrations/projects/${projectId}/properties`;
@@ -889,59 +892,59 @@ export class Approx implements INodeType {
                         const qs = buildDqbQuery(this.getNodeParameter('queryOptions', i, {}) as any);
                         const res = await approxApiRequest.call(this, 'GET', base, undefined, qs);
                         const { items: rows } = unwrapList(res);
-                        returnData.push(...rows.map((json) => ({ json })));
+                        returnData.push(...rows.map((json) => ({ json, pairedItem: { item: i } })));
                     } else if (operation === 'get') {
                         const pid = this.getNodeParameter('propertyId', i) as string;
                         const res = await approxApiRequest.call(this, 'GET', `${base}/${pid}`);
-                        returnData.push({ json: res });
+                        returnData.push({ json: res, pairedItem: { item: i } });
                     } else if (operation === 'create') {
                         const raw = this.getNodeParameter('propertyJson', i) as string | object;
                         const property = typeof raw === 'string' ? JSON.parse(raw) : raw;
                         const res = await approxApiRequest.call(this, 'POST', base, { property });
-                        returnData.push({ json: res ?? { success: true } });
+                        returnData.push({ json: res ?? { success: true }, pairedItem: { item: i } });
                     } else if (operation === 'createMany') {
                         const raw = this.getNodeParameter('propertiesJson', i) as string | object;
                         const properties = typeof raw === 'string' ? JSON.parse(raw) : raw;
                         const res = await approxApiRequest.call(this, 'POST', `${base}:bulk`, { properties });
-                        returnData.push({ json: res ?? { success: true } });
+                        returnData.push({ json: res ?? { success: true }, pairedItem: { item: i } });
                     } else if (operation === 'updateName') {
                         const pid = this.getNodeParameter('propertyId', i) as string;
                         const name = this.getNodeParameter('name', i) as string;
                         await approxApiRequest.call(this, 'PUT', `${base}/${pid}/name`, { name });
-                        returnData.push({ json: { success: true, id: pid, name } });
+                        returnData.push({ json: { success: true, id: pid, name }, pairedItem: { item: i } });
                     } else if (operation === 'updateMultiplier') {
                         const pid = this.getNodeParameter('propertyId', i) as string;
                         const multiplier = this.getNodeParameter('multiplier', i) as number;
                         await approxApiRequest.call(this, 'PUT', `${base}/${pid}/multiplier`, { multiplier });
-                        returnData.push({ json: { success: true, id: pid, multiplier } });
+                        returnData.push({ json: { success: true, id: pid, multiplier }, pairedItem: { item: i } });
                     } else if (operation === 'delete') {
                         const pid = this.getNodeParameter('propertyId', i) as string;
                         await approxApiRequest.call(this, 'DELETE', `${base}/${pid}`);
-                        returnData.push({ json: { success: true, id: pid } });
+                        returnData.push({ json: { success: true, id: pid }, pairedItem: { item: i } });
                     }
 
-                // ---------- Property Type ----------
+                    // ---------- Property Type ----------
                 } else if (resource === 'propertyType') {
                     if (operation === 'getByTakeoffTemplate') {
                         const id = this.getNodeParameter('takeoffTemplateId', i) as string;
                         const res = await approxApiRequest.call(this, 'GET', `/api/integrations/templates/takeoff/${id}/property-types`);
-                        returnData.push({ json: res });
+                        returnData.push({ json: res, pairedItem: { item: i } });
                     } else if (operation === 'getByProject') {
                         const id = this.getNodeParameter('projectId', i) as string;
                         const res = await approxApiRequest.call(this, 'GET', `/api/integrations/templates/projects/${id}/property-types`);
-                        returnData.push({ json: res });
+                        returnData.push({ json: res, pairedItem: { item: i } });
                     }
 
-                // ---------- Report ----------
+                    // ---------- Report ----------
                 } else if (resource === 'report') {
                     if (operation === 'create') {
                         const projectId = this.getNodeParameter('projectId', i) as string;
                         const res = await approxApiRequest.call(this, 'POST', '/api/integrations/takeoff-reports', { projectId });
-                        returnData.push({ json: res });
+                        returnData.push({ json: res, pairedItem: { item: i } });
                     } else if (operation === 'get') {
                         const id = this.getNodeParameter('reportId', i) as string;
                         const res = await approxApiRequest.call(this, 'GET', `/api/integrations/takeoff-reports/${id}`);
-                        returnData.push({ json: res });
+                        returnData.push({ json: res, pairedItem: { item: i } });
                     } else if (operation === 'download') {
                         const id = this.getNodeParameter('reportId', i) as string;
                         const binaryPropertyName = this.getNodeParameter('binaryPropertyName', i) as string;
@@ -957,42 +960,42 @@ export class Approx implements INodeType {
                         const contentType = response.headers?.['content-type'] ?? 'application/zip';
                         const filename = `report-${id}.zip`;
                         const binary = await this.helpers.prepareBinaryData(buffer, filename, contentType);
-                        returnData.push({ json: { reportId: id, filename, mimeType: contentType }, binary: { [binaryPropertyName]: binary } });
+                        returnData.push({ json: { reportId: id, filename, mimeType: contentType }, binary: { [binaryPropertyName]: binary }, pairedItem: { item: i } });
                     }
 
-                // ---------- Report Template ----------
+                    // ---------- Report Template ----------
                 } else if (resource === 'reportTemplate' && operation === 'getMany') {
                     const id = this.getNodeParameter('takeoffTemplateId', i) as string;
                     const res = await approxApiRequest.call(this, 'GET', `/api/integrations/templates/takeoff/${id}/takeoff-report-templates`);
                     const { items: rows } = unwrapList(res);
-                    returnData.push(...rows.map((json) => ({ json })));
+                    returnData.push(...rows.map((json) => ({ json, pairedItem: { item: i } })));
 
-                // ---------- Takeoff Template ----------
+                    // ---------- Takeoff Template ----------
                 } else if (resource === 'takeoffTemplate') {
                     if (operation === 'getMany') {
                         const culture = this.getNodeParameter('culture', i) as string;
                         const res = await approxApiRequest.call(this, 'GET', '/api/integrations/templates/takeoff', undefined, { culture });
                         const { items: rows } = unwrapList(res);
-                        returnData.push(...rows.map((json) => ({ json })));
+                        returnData.push(...rows.map((json) => ({ json, pairedItem: { item: i } })));
                     } else if (operation === 'get') {
                         const id = this.getNodeParameter('takeoffTemplateId', i) as string;
                         const res = await approxApiRequest.call(this, 'GET', `/api/integrations/templates/takeoff/${id}`);
-                        returnData.push({ json: res });
+                        returnData.push({ json: res, pairedItem: { item: i } });
                     }
 
-                // ---------- Work Group Type ----------
+                    // ---------- Work Group Type ----------
                 } else if (resource === 'workGroupType' && operation === 'getMany') {
                     const projectId = this.getNodeParameter('projectId', i) as string;
                     const res = await approxApiRequest.call(this, 'GET', `/api/integrations/projects/${projectId}/work-group-types`);
                     const { items: rows } = unwrapList(res);
-                    returnData.push(...rows.map((json) => ({ json })));
+                    returnData.push(...rows.map((json) => ({ json, pairedItem: { item: i } })));
                 }
             } catch (error) {
                 if (this.continueOnFail()) {
-                    returnData.push({ json: { error: (error as Error).message }, pairedItem: i });
+                    returnData.push({ json: { error: (error as Error).message }, pairedItem: { item: i } });
                     continue;
                 }
-                throw error;
+                throw new NodeApiError(this.getNode(), error as JsonObject);
             }
         }
 
