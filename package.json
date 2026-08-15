@@ -1,6 +1,6 @@
 {
     "name": "@approx-tech/n8n-nodes-approx",
-    "version": "0.6.0",
+    "version": "0.6.1",
     "description": "n8n community nodes for Approx — construction cost-estimation and quantity-takeoff automation.",
     "keywords": [
         "n8n-community-node-package",
@@ -35,7 +35,8 @@
         "format": "prettier nodes credentials utils --write",
         "lint": "eslint --ext .ts nodes credentials utils && eslint package.json",
         "lintfix": "eslint --ext .ts nodes credentials utils --fix && eslint package.json --fix",
-        "prepublishOnly": "npm run build && npm run lint"
+        "scan": "npx --yes @n8n/node-cli@latest lint",
+        "prepublishOnly": "npm run build && npm run lint && npm run scan"
     },
     "files": [
         "dist",

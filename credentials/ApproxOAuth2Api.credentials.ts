@@ -1,4 +1,5 @@
 import {
+    Icon,
     ICredentialTestRequest,
     ICredentialType,
     INodeProperties,
@@ -22,6 +23,8 @@ export class ApproxOAuth2Api implements ICredentialType {
     extends = ['oAuth2Api'];
 
     displayName = 'Approx OAuth2 API';
+
+    icon: Icon = { light: 'file:approx.svg', dark: 'file:approx.svg' };
 
     documentationUrl = 'https://github.com/Approx-Tech/n8n-nodes-approx/blob/main/README.md';
 
