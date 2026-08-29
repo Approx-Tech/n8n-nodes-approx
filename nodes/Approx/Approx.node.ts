@@ -995,6 +995,12 @@ export class Approx implements INodeType {
                     returnData.push({ json: { error: (error as Error).message }, pairedItem: { item: i } });
                     continue;
                 }
+                // `approxApiRequest` already resolves Approx's bilingual error envelope (and the
+                // access-denied fallbacks) into a NodeApiError. Re-wrapping one would let n8n
+                // replace that message with its generic status-code text, so pass it through.
+                if (error instanceof NodeApiError || error instanceof NodeOperationError) {
+                    throw error;
+                }
                 throw new NodeApiError(this.getNode(), error as JsonObject);
             }
         }

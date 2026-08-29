@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.6.2] - 2026-08-29
+
+### Fixed
+
+- **Readable access-denied errors.** The Integrations API is gated by the `integrations:*` Auth0 permissions, which only organization (Workplace) accounts hold — a free account with no organization is refused with a bare `403` and no response body, which n8n rendered as the generic "Forbidden - perhaps check your credentials?". The node now explains the real cause for both `403` and `401`.
+  - The credential test declares `responseCode` rules, so an unusable credential fails at **connect** time instead of on the first workflow run.
+  - `approxApiRequest` reads Approx's `Errors[].ErrorEN/ErrorTR` envelope from every shape n8n can surface it in (`response.body`, `response.data`, either nested under `cause`), and falls back to an explanatory message when the response carries no body.
+  - Errors already resolved into a `NodeApiError` are no longer re-wrapped in the node's `execute` catch, which could replace the resolved message with n8n's generic status-code text.
+
+### Documentation
+
+- README states up front that these nodes require a Workplace (organization) account, and what a `403` on the credential test means.
+
 ## [0.6.1] - 2026-08-15
 
 ### Fixed (community-verification / lint compliance)

@@ -105,5 +105,27 @@ export class ApproxOAuth2Api implements ICredentialType {
             url: '/api/integrations/projects',
             qs: { 'dqb.take': 1 },
         },
+        // The endpoint above is gated by the `integrations:projects:read` permission, which
+        // only organization (Workplace) accounts are granted. Without it the API answers 403
+        // with no body, so n8n would otherwise show its generic status-code text. These rules
+        // name the real cause, and do it while connecting rather than on the first run.
+        rules: [
+            {
+                type: 'responseCode',
+                properties: {
+                    value: 403,
+                    message:
+                        'Access denied. This credential holds none of the required integrations:* permissions. The Approx Integrations API is available to Workplace (organization) accounts only — a free account that does not belong to an Approx organization cannot use these nodes. Ask your Approx administrator to link the application to your organization and grant the permissions.',
+                },
+            },
+            {
+                type: 'responseCode',
+                properties: {
+                    value: 401,
+                    message:
+                        'Authentication failed. Check the Client ID, Client Secret, Auth0 Domain and Audience on this credential.',
+                },
+            },
+        ],
     };
 }
