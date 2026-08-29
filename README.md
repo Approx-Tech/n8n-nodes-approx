@@ -17,6 +17,7 @@ cost-estimation and quantity-takeoff workflows.
 ## Contents
 
 - [Install](#install)
+- [Requirements](#requirements)
 - [Credentials](#credentials)
 - [Resources and operations](#resources-and-operations)
 - [Usage example: list projects, generate a report, download the ZIP](#usage-example-list-projects-generate-a-report-download-the-zip)
@@ -51,11 +52,22 @@ The package will appear in the verified community catalogue once approved.
 
 ---
 
+## Requirements
+
+> **The Approx Integrations API is a Workplace (organization) feature.** Free
+> Approx accounts — accounts that do not belong to an Approx organization —
+> cannot use these nodes. Access is granted through the `integrations:*`
+> permissions on your Auth0 application, which Approx assigns per organization.
+> Without them every request, including the credential test, fails with
+> **403 Forbidden**.
+
+---
+
 ## Credentials
 
 Approx authenticates with Auth0 **Machine-to-Machine** (client-credentials)
 tokens. Ask your Approx contact for a `client_id`/`client_secret` issued by the
-Approx Auth0 tenant.
+Approx Auth0 tenant **and linked to your Approx organization**.
 
 In n8n: **Credentials → New → Approx OAuth2 API**.
 
@@ -71,6 +83,11 @@ n8n handles fetching, caching and refreshing the bearer token — there is no
 custom token code in this package. Click **Save**: n8n will issue a test
 request to `GET /api/integrations/projects?dqb.take=1` and confirm the
 credential works.
+
+If that test returns **403**, the token was issued but carries none of the
+`integrations:*` permissions — the account is on the free plan, or the
+application has not been granted them. Ask your Approx administrator to link the
+application to your organization and grant the permissions your workflows need.
 
 ---
 
