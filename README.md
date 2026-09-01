@@ -81,7 +81,7 @@ In n8n: **Credentials → New → Approx OAuth2 API**.
 
 n8n handles fetching, caching and refreshing the bearer token — there is no
 custom token code in this package. Click **Save**: n8n will issue a test
-request to `GET /api/integrations/projects?dqb=offset=0&count=1` and confirm the
+request to `GET /api/integrations/projects?dqb=offset%3D0%26count%3D1` and confirm the
 credential works.
 
 If that test returns **403**, the token was issued but carries none of the
@@ -127,6 +127,11 @@ Approx API resolves DynamicQueryBuilder options from:
   `GreaterThan`, `GreaterThanOrEqual`, `LessThan`, `LessThanOrEqual`. A value
   already containing `o=` is passed through as a raw DQB expression.
 - **Take** is capped at 200, matching the API.
+
+Property names and values are percent-encoded inside the expression before the whole thing is
+encoded again as the `dqb` parameter, so a value containing `&` or `=` — `R&D`, say — survives
+instead of being read as another DQB field. An **Order By** with a direction other than `asc` or
+`desc` is rejected rather than silently sorted ascending.
 
 ---
 

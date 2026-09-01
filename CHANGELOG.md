@@ -16,9 +16,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
   - `Take` is clamped to the 200 the API accepts, and `Skip` to zero or more.
   - The credential test used `dqb.take=1` for the same reason and fetched a full page; it now asks for one item.
 
+  - Property names and values are percent-encoded inside the expression before the whole thing is encoded again as the `dqb` parameter. Without that inner layer a value containing `&` or `=` is read as another DQB field: `Name|Equals|Test Project` sent unencoded arrives as `v=Test` and matches nothing. Verified against the API, where the encoded form matches and the unencoded form returns an empty list.
+  - An `Order By` direction other than `asc` or `desc` is rejected instead of being silently treated as ascending, which is harder to notice than an error.
+  - A raw DQB expression is now recognised by a leading `o=` rather than `o=` anywhere in the value, so ordinary shorthand such as `Name|Contains|foo=bar` is no longer mistaken for one.
+
 ### Changed
 
 - **Workflows that set paging will behave differently**, because it previously had no effect. A workflow relying on always receiving the first page may now receive a different one. Minor rather than patch for that reason.
+- The DQB builder moved to `utils/dqb.ts`; `utils/GenericFunctions.ts` re-exports it, so existing imports are unaffected.
 
 
 ## [0.6.2] - 2026-08-29
