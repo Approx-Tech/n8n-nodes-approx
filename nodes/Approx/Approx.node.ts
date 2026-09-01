@@ -247,10 +247,10 @@ export class Approx implements INodeType {
                 default: {},
                 displayOptions: { show: { resource: ['pricingLibrary'], operation: ['getMany'] } },
                 options: [
-                    { displayName: 'Order By', name: 'orderBy', type: 'string', default: '', placeholder: 'name asc', description: 'DQB order-by expression' },
+                    { displayName: 'Order By', name: 'orderBy', type: 'string', default: '', placeholder: 'Name asc', description: 'Sort as Property, optionally followed by asc or desc. Example: Name desc.' },
                     { displayName: 'Skip', name: 'skip', type: 'number', default: 0, description: 'Number of items to skip' },
                     { displayName: 'Take', name: 'take', type: 'number', default: 50, description: 'Number of items to return (max 200)' },
-                    { displayName: 'Where', name: 'where', type: 'string', default: '', placeholder: 'name|Contains|foo', description: 'DQB where expression' },
+                    { displayName: 'Where', name: 'where', type: 'string', default: '', placeholder: 'Name|Contains|foo', description: 'Filter as Property|Operation|Value; separate several with a semicolon. Operations include Equals, NotEqual, Contains, StartsWith, EndsWith, In, GreaterThan, GreaterThanOrEqual, LessThan and LessThanOrEqual.' },
                 ],
             },
 
@@ -305,10 +305,10 @@ export class Approx implements INodeType {
                 default: {},
                 displayOptions: { show: { resource: ['pricing'], operation: ['getMany'] } },
                 options: [
-                    { displayName: 'Order By', name: 'orderBy', type: 'string', default: '', placeholder: 'name asc', description: 'DQB order-by expression' },
+                    { displayName: 'Order By', name: 'orderBy', type: 'string', default: '', placeholder: 'Name asc', description: 'Sort as Property, optionally followed by asc or desc. Example: Name desc.' },
                     { displayName: 'Skip', name: 'skip', type: 'number', default: 0, description: 'Number of items to skip' },
                     { displayName: 'Take', name: 'take', type: 'number', default: 50, description: 'Items per page (max 200)' },
-                    { displayName: 'Where', name: 'where', type: 'string', default: '', placeholder: 'name|Contains|foo', description: 'DQB where expression' },
+                    { displayName: 'Where', name: 'where', type: 'string', default: '', placeholder: 'Name|Contains|foo', description: 'Filter as Property|Operation|Value; separate several with a semicolon. Operations include Equals, NotEqual, Contains, StartsWith, EndsWith, In, GreaterThan, GreaterThanOrEqual, LessThan and LessThanOrEqual.' },
                 ],
             },
 
@@ -437,10 +437,10 @@ export class Approx implements INodeType {
                 default: {},
                 displayOptions: { show: { resource: ['project'], operation: ['getMany'] } },
                 options: [
-                    { displayName: 'Order By', name: 'orderBy', type: 'string', default: '', placeholder: 'name asc', description: 'DQB order-by expression' },
+                    { displayName: 'Order By', name: 'orderBy', type: 'string', default: '', placeholder: 'Name asc', description: 'Sort as Property, optionally followed by asc or desc. Example: Name desc.' },
                     { displayName: 'Skip', name: 'skip', type: 'number', default: 0, description: 'Number of items to skip' },
                     { displayName: 'Take', name: 'take', type: 'number', default: 50, description: 'Number of items to return (max 200)' },
-                    { displayName: 'Where', name: 'where', type: 'string', default: '', placeholder: 'name|Contains|foo', description: 'DQB where expression' },
+                    { displayName: 'Where', name: 'where', type: 'string', default: '', placeholder: 'Name|Contains|foo', description: 'Filter as Property|Operation|Value; separate several with a semicolon. Operations include Equals, NotEqual, Contains, StartsWith, EndsWith, In, GreaterThan, GreaterThanOrEqual, LessThan and LessThanOrEqual.' },
                 ],
             },
 
@@ -527,10 +527,10 @@ export class Approx implements INodeType {
                 default: {},
                 displayOptions: { show: { resource: ['property'], operation: ['getMany'] } },
                 options: [
-                    { displayName: 'Order By', name: 'orderBy', type: 'string', default: '', description: 'DQB order-by expression' },
+                    { displayName: 'Order By', name: 'orderBy', type: 'string', default: '', placeholder: 'Name asc', description: 'Sort as Property, optionally followed by asc or desc. Example: Name desc.' },
                     { displayName: 'Skip', name: 'skip', type: 'number', default: 0, description: 'Number of items to skip' },
                     { displayName: 'Take', name: 'take', type: 'number', default: 50, description: 'Number of items to return (max 200)' },
-                    { displayName: 'Where', name: 'where', type: 'string', default: '', description: 'DQB where expression' },
+                    { displayName: 'Where', name: 'where', type: 'string', default: '', placeholder: 'Name|Contains|foo', description: 'Filter as Property|Operation|Value; separate several with a semicolon. Operations include Equals, NotEqual, Contains, StartsWith, EndsWith, In, GreaterThan, GreaterThanOrEqual, LessThan and LessThanOrEqual.' },
                 ],
             },
 

@@ -103,7 +103,10 @@ export class ApproxOAuth2Api implements ICredentialType {
             method: 'GET',
             baseURL: '={{$credentials.baseUrl}}',
             url: '/api/integrations/projects',
-            qs: { 'dqb.take': 1 },
+            // One item is enough to prove the credential works. Must be the single `dqb`
+            // parameter the API resolves DQB from; `dqb.take` is ignored and silently returns a
+            // full page.
+            qs: { dqb: 'offset=0&count=1' },
         },
         // The endpoint above is gated by the `integrations:projects:read` permission, which
         // only organization (Workplace) accounts are granted. Without it the API answers 403

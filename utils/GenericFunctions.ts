@@ -128,20 +128,5 @@ export function unwrapList(payload: any): { items: any[]; totalCount: number } {
     return { items, totalCount };
 }
 
-/**
- * Builds the dqb.* query-string fragment from a flat options object.
- */
-export function buildDqbQuery(options: IDataObject = {}): IDataObject {
-    const qs: IDataObject = {};
-    const { skip, take, orderBy, where } = options as {
-        skip?: number;
-        take?: number;
-        orderBy?: string;
-        where?: string;
-    };
-    if (skip !== undefined && skip !== null) qs['dqb.skip'] = skip;
-    if (take !== undefined && take !== null) qs['dqb.take'] = take;
-    if (orderBy) qs['dqb.orderBy'] = orderBy;
-    if (where) qs['dqb.where'] = where;
-    return qs;
-}
+// Kept re-exported so existing imports from GenericFunctions keep working.
+export { buildDqbQuery, MAX_TAKE } from './dqb';
