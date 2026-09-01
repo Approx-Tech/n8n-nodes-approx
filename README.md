@@ -81,7 +81,7 @@ In n8n: **Credentials → New → Approx OAuth2 API**.
 
 n8n handles fetching, caching and refreshing the bearer token — there is no
 custom token code in this package. Click **Save**: n8n will issue a test
-request to `GET /api/integrations/projects?dqb.take=1` and confirm the
+request to `GET /api/integrations/projects?dqb=offset=0&count=1` and confirm the
 credential works.
 
 If that test returns **403**, the token was issued but carries none of the
@@ -113,8 +113,20 @@ resource, then the operation, then fill in the parameters.
 | **Work Group Type** | Get Many | `GET /api/integrations/projects/{projectId}/work-group-types` |
 
 List endpoints accept the optional **Query Options** collection
-(`Skip`, `Take`, `Order By`, `Where`) which is mapped to the standard Approx
-DQB query string (`dqb.skip`, `dqb.take`, `dqb.orderBy`, `dqb.where`).
+(`Skip`, `Take`, `Order By`, `Where`), mapped to the single `dqb` parameter the
+Approx API resolves DynamicQueryBuilder options from:
+
+```
+?dqb=offset%3D0%26count%3D50%26s%3DName%2Casc
+```
+
+- **Order By** — `Property`, optionally with `asc` or `desc`: `Name desc`.
+- **Where** — `Property|Operation|Value`, several separated by `;` and combined
+  with `And`: `Name|Contains|foo;Multiplier|GreaterThan|1`. Operations include
+  `Equals`, `NotEqual`, `Contains`, `StartsWith`, `EndsWith`, `In`,
+  `GreaterThan`, `GreaterThanOrEqual`, `LessThan`, `LessThanOrEqual`. A value
+  already containing `o=` is passed through as a raw DQB expression.
+- **Take** is capped at 200, matching the API.
 
 ---
 

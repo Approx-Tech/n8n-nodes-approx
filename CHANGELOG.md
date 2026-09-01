@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-09-01
+
+### Fixed
+
+- **Query Options now reach the API.** `Skip`, `Take`, `Order By` and `Where` were sent as `dqb.skip` / `dqb.take` / `dqb.orderBy` / `dqb.where`, but the Approx API resolves DynamicQueryBuilder options from a **single** parameter named `dqb` holding a complete expression. The four were therefore never read, and every list silently returned the default first page whatever the node was set to. They are now built into one `dqb` value matching what the Approx web app sends, e.g. `?dqb=offset%3D0%26count%3D50%26s%3DName%2Casc`.
+  - `Order By` accepts `Property`, `Property asc` or `Property,desc`.
+  - `Where` accepts `Property|Operation|Value`, several separated by `;` and combined with `And`; a value already containing `o=` is passed through as a raw DQB expression. An unparseable expression now fails with a message naming the clause instead of being dropped.
+  - `Take` is clamped to the 200 the API accepts, and `Skip` to zero or more.
+  - The credential test used `dqb.take=1` for the same reason and fetched a full page; it now asks for one item.
+
+### Changed
+
+- **Workflows that set paging will behave differently**, because it previously had no effect. A workflow relying on always receiving the first page may now receive a different one. Minor rather than patch for that reason.
+
+
 ## [0.6.2] - 2026-08-29
 
 ### Fixed
