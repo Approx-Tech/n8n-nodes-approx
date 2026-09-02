@@ -112,26 +112,44 @@ resource, then the operation, then fill in the parameters.
 | **Takeoff Template** | Get Many, Get | `/api/integrations/templates/takeoff[/{id}]` |
 | **Work Group Type** | Get Many | `GET /api/integrations/projects/{projectId}/work-group-types` |
 
-List endpoints accept the optional **Query Options** collection
-(`Skip`, `Take`, `Order By`, `Where`), mapped to the single `dqb` parameter the
-Approx API resolves DynamicQueryBuilder options from:
+### Filtering and paging
+
+The four list endpoints — Project, Property, Pricing Library and Pricing — take a **Filters**
+collection and a **Query Options** collection (`Skip`, `Take`, `Order By`). Both are mapped to the
+single `dqb` parameter the Approx API resolves DynamicQueryBuilder options from:
 
 ```
-?dqb=offset%3D0%26count%3D50%26s%3DName%2Casc
+?dqb=o%3DContains%26p%3DName%26v%3DTest%26s%3DName%2Casc%26offset%3D0%26count%3D50
 ```
 
-- **Order By** — `Property`, optionally with `asc` or `desc`: `Name desc`.
-- **Where** — `Property|Operation|Value`, several separated by `;` and combined
-  with `And`: `Name|Contains|foo;Multiplier|GreaterThan|1`. Operations include
-  `Equals`, `NotEqual`, `Contains`, `StartsWith`, `EndsWith`, `In`,
-  `GreaterThan`, `GreaterThanOrEqual`, `LessThan`, `LessThanOrEqual`. A value
-  already containing `o=` is passed through as a raw DQB expression.
-- **Take** is capped at 200, matching the API.
+**Filters** — each condition is a Property, an Operation, a Value, and a Logical Operator:
+
+| Field | Notes |
+|---|---|
+| Property | Picked from the properties that endpoint exposes. Set an expression to use one not listed. |
+| Operation | `Equals`, `Not Equal`, `Contains`, `Starts With`, `Ends With`, `Greater Than`, `Greater Than Or Equal`, `Less Than`, `Less Than Or Equal`, `In`. |
+| Value | The literal `null` tests for no value; `In` takes a comma-separated list; enum properties accept their name, e.g. `SingleLine`. |
+| Logical Operator | How this condition joins to the **next** one. `And Also`, `Or Else`, `And`, `Or`, `Xor`. |
+
+Conditions combine **left to right with no grouping**, so `A Or Else`, `B And Also`, `C` evaluates
+as `(A or B) and C`. The operator on the last condition is ignored.
+
+**Order By** takes `Property`, optionally with `asc` or `desc`: `Name desc`. A direction other than
+those two is rejected rather than silently sorted ascending.
+
+**Take** is capped at 200 and defaults to 50. Both `offset` and `count` are always sent: if either
+is missing the API applies neither, and — the part that bites — skips its own page-size cap, so an
+unfiltered pricing list returns every row.
 
 Property names and values are percent-encoded inside the expression before the whole thing is
 encoded again as the `dqb` parameter, so a value containing `&` or `=` — `R&D`, say — survives
-instead of being read as another DQB field. An **Order By** with a direction other than `asc` or
-`desc` is rejected rather than silently sorted ascending.
+instead of being read as another DQB field. Parentheses are escaped too: the API reads a value
+starting with `(` as an `Any`/`All` sub-query.
+
+**Where** is the older text form of Filters, kept for workflows built before this collection
+existed: `Property|Operation|Value`, several separated by `;`. It cannot express a logical operator,
+so its conditions always combine with `And Also`. A value starting with `o=` is passed through as a
+raw DQB expression, and cannot be combined with Filters.
 
 ---
 

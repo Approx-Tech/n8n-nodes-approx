@@ -6,6 +6,44 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-09-02
+
+Brings the node's filtering up to what the Approx MCP server already does, so the same query can be
+expressed in either.
+
+### Added
+
+- **Filters collection** on Project, Property, Pricing Library and Pricing — Get Many. Each
+  condition is a Property (picked from the properties that endpoint actually exposes), an Operation,
+  a Value and a Logical Operator, instead of the `Name|Contains|foo` text form.
+  - All ten operations are selectable: `Equals`, `Not Equal`, `Contains`, `Starts With`,
+    `Ends With`, `Greater Than`, `Greater Than Or Equal`, `Less Than`, `Less Than Or Equal`, `In`.
+  - Conditions can be joined with `And Also`, `Or Else`, `And`, `Or` or `Xor`. Previously every
+    condition was joined with `And` and there was no way to say otherwise. They combine left to
+    right with no grouping, so `A Or Else`, `B And Also`, `C` means `(A or B) and C`; the operator
+    on the last condition is ignored. (DynamicQueryBuilder's `None` is deliberately not offered — it
+    parses, then throws server-side as soon as there is more than one condition.)
+  - The literal `null` is passed through unencoded so it keeps testing for no value.
+
+### Fixed
+
+- **Values containing parentheses no longer break the query.** `encodeURIComponent` leaves `(` and
+  `)` alone, and the API reads a value starting with `(` as the beginning of an `Any`/`All`
+  sub-query — so filtering on a name like `(eski) Blok A` silently matched nothing. They are now
+  escaped explicitly.
+- **`offset` and `count` are always sent.** Omitting either left the API applying neither Skip nor
+  Take *and* skipping its own 200-row page cap, returning the entire filtered set — slow enough on a
+  pricing library to look like a hung workflow. A list with no Take now asks for 50.
+
+### Changed
+
+- **A Get Many with no Take set now returns 50 rows rather than everything.** That is the fix above,
+  and the reason this is a minor rather than a patch.
+- **Where** is now documented as the older form of Filters. It still works unchanged, and its
+  conditions are combined with any structured Filters on the same node. Pairing a raw `o=...`
+  expression with Filters is refused rather than silently producing a malformed query, because
+  joining them would mean rewriting the raw expression's final operation.
+
 ## [0.7.0] - 2026-09-01
 
 ### Fixed
