@@ -1,4 +1,5 @@
 import {
+    IDataObject,
     IExecuteFunctions,
     INodeExecutionData,
     INodeType,
@@ -240,6 +241,80 @@ export class Approx implements INodeType {
                 ],
             },
             {
+                displayName: 'Filters',
+                name: 'filters',
+                type: 'fixedCollection',
+                placeholder: 'Add Filter',
+                default: {},
+                typeOptions: { multipleValues: true },
+                displayOptions: { show: { resource: ['pricingLibrary'], operation: ['getMany'] } },
+                description: 'Conditions narrowing the results. They are combined left to right with no grouping, so A Or Else, B And Also, C means (A or B) and C.',
+                options: [
+                    {
+                        displayName: 'Condition',
+                        name: 'condition',
+                        values: [
+                            {
+                                displayName: 'Property',
+                                name: 'property',
+                                type: 'options',
+                                default: 'Name',
+                                description: 'Property to filter on. Set an expression to use a property not listed here.',
+                                options: [
+                                    { name: 'Code', value: 'Code' },
+                                    { name: 'Created At', value: 'CreatedAt' },
+                                    { name: 'ID', value: 'ID' },
+                                    { name: 'Library Type', value: 'LibraryType' },
+                                    { name: 'Name', value: 'Name' },
+                                    { name: 'Official Library Type', value: 'OfficialLibraryType' },
+                                ],
+                            },
+                            {
+                                displayName: 'Operation',
+                                name: 'operation',
+                                type: 'options',
+                                noDataExpression: true,
+                                default: 'Equals',
+                                description: 'How to compare. Use Contains for substring matching on text.',
+                                options: [
+                                    { name: 'Contains', value: 'Contains' },
+                                    { name: 'Ends With', value: 'EndsWith' },
+                                    { name: 'Equals', value: 'Equals' },
+                                    { name: 'Greater Than', value: 'GreaterThan' },
+                                    { name: 'Greater Than Or Equal', value: 'GreaterThanOrEqual' },
+                                    { name: 'In', value: 'In' },
+                                    { name: 'Less Than', value: 'LessThan' },
+                                    { name: 'Less Than Or Equal', value: 'LessThanOrEqual' },
+                                    { name: 'Not Equal', value: 'NotEqual' },
+                                    { name: 'Starts With', value: 'StartsWith' },
+                                ],
+                            },
+                            {
+                                displayName: 'Value',
+                                name: 'value',
+                                type: 'string',
+                                default: '',
+                                description: 'Enum properties accept their name, e.g. Official for Library Type. Use the literal null to test for no value.',
+                            },
+                            {
+                                displayName: 'Logical Operator',
+                                name: 'logicalOperator',
+                                type: 'options',
+                                default: 'AndAlso',
+                                description: 'How this condition joins to the next one. Ignored on the last condition.',
+                                options: [
+                                    { name: 'And', value: 'And' },
+                                    { name: 'And Also', value: 'AndAlso' },
+                                    { name: 'Or', value: 'Or' },
+                                    { name: 'Or Else', value: 'OrElse' },
+                                    { name: 'Xor', value: 'Xor' },
+                                ],
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
                 displayName: 'Query Options',
                 name: 'queryOptions',
                 type: 'collection',
@@ -250,7 +325,7 @@ export class Approx implements INodeType {
                     { displayName: 'Order By', name: 'orderBy', type: 'string', default: '', placeholder: 'Name asc', description: 'Sort as Property, optionally followed by asc or desc. Example: Name desc.' },
                     { displayName: 'Skip', name: 'skip', type: 'number', default: 0, description: 'Number of items to skip' },
                     { displayName: 'Take', name: 'take', type: 'number', default: 50, description: 'Number of items to return (max 200)' },
-                    { displayName: 'Where', name: 'where', type: 'string', default: '', placeholder: 'Name|Contains|foo', description: 'Filter as Property|Operation|Value; separate several with a semicolon. Operations include Equals, NotEqual, Contains, StartsWith, EndsWith, In, GreaterThan, GreaterThanOrEqual, LessThan and LessThanOrEqual.' },
+                    { displayName: 'Where', name: 'where', type: 'string', default: '', placeholder: 'Name|Contains|foo', description: 'Older text form of Filters, kept for existing workflows. Filter as Property|Operation|Value; separate several with a semicolon. It cannot express a logical operator, so its conditions always combine with And Also.' },
                 ],
             },
 
@@ -298,6 +373,89 @@ export class Approx implements INodeType {
                 description: 'Upper bound (inclusive) of the pricing validity window. Format: YYYY-MM-DD.',
             },
             {
+                displayName: 'Filters',
+                name: 'filters',
+                type: 'fixedCollection',
+                placeholder: 'Add Filter',
+                default: {},
+                typeOptions: { multipleValues: true },
+                displayOptions: { show: { resource: ['pricing'], operation: ['getMany'] } },
+                description: 'Conditions narrowing the results. They are combined left to right with no grouping, so A Or Else, B And Also, C means (A or B) and C.',
+                options: [
+                    {
+                        displayName: 'Condition',
+                        name: 'condition',
+                        values: [
+                            {
+                                displayName: 'Property',
+                                name: 'property',
+                                type: 'options',
+                                default: 'Code',
+                                description: 'Property to filter on. Set an expression to use a property not listed here.',
+                                options: [
+                                    { name: 'Code', value: 'Code' },
+                                    { name: 'Contractor Profit Percentage', value: 'ContractorProfitPercentage' },
+                                    { name: 'Created At', value: 'CreatedAt' },
+                                    { name: 'Definition', value: 'Definition' },
+                                    { name: 'End Date', value: 'EndDate' },
+                                    { name: 'ID', value: 'ID' },
+                                    { name: 'Includes Carriage', value: 'IncludesCarriage' },
+                                    { name: 'Pricing Library ID', value: 'PricingLibraryID' },
+                                    { name: 'Pricing State', value: 'PricingState' },
+                                    { name: 'Pricing Type', value: 'PricingType' },
+                                    { name: 'Pricing Unit', value: 'PricingUnit' },
+                                    { name: 'Proforma Calculation Method', value: 'ProformaCalculationMethod' },
+                                    { name: 'Raw Unit Price', value: 'RawUnitPrice' },
+                                    { name: 'Start Date', value: 'StartDate' },
+                                    { name: 'Unit Price', value: 'UnitPrice' },
+                                ],
+                            },
+                            {
+                                displayName: 'Operation',
+                                name: 'operation',
+                                type: 'options',
+                                noDataExpression: true,
+                                default: 'Equals',
+                                description: 'How to compare. Use Contains for substring matching on text.',
+                                options: [
+                                    { name: 'Contains', value: 'Contains' },
+                                    { name: 'Ends With', value: 'EndsWith' },
+                                    { name: 'Equals', value: 'Equals' },
+                                    { name: 'Greater Than', value: 'GreaterThan' },
+                                    { name: 'Greater Than Or Equal', value: 'GreaterThanOrEqual' },
+                                    { name: 'In', value: 'In' },
+                                    { name: 'Less Than', value: 'LessThan' },
+                                    { name: 'Less Than Or Equal', value: 'LessThanOrEqual' },
+                                    { name: 'Not Equal', value: 'NotEqual' },
+                                    { name: 'Starts With', value: 'StartsWith' },
+                                ],
+                            },
+                            {
+                                displayName: 'Value',
+                                name: 'value',
+                                type: 'string',
+                                default: '',
+                                description: 'Enum properties accept their name, e.g. SingleLine for Pricing Type. Use the literal null to test for no value.',
+                            },
+                            {
+                                displayName: 'Logical Operator',
+                                name: 'logicalOperator',
+                                type: 'options',
+                                default: 'AndAlso',
+                                description: 'How this condition joins to the next one. Ignored on the last condition.',
+                                options: [
+                                    { name: 'And', value: 'And' },
+                                    { name: 'And Also', value: 'AndAlso' },
+                                    { name: 'Or', value: 'Or' },
+                                    { name: 'Or Else', value: 'OrElse' },
+                                    { name: 'Xor', value: 'Xor' },
+                                ],
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
                 displayName: 'Query Options',
                 name: 'queryOptions',
                 type: 'collection',
@@ -308,7 +466,7 @@ export class Approx implements INodeType {
                     { displayName: 'Order By', name: 'orderBy', type: 'string', default: '', placeholder: 'Name asc', description: 'Sort as Property, optionally followed by asc or desc. Example: Name desc.' },
                     { displayName: 'Skip', name: 'skip', type: 'number', default: 0, description: 'Number of items to skip' },
                     { displayName: 'Take', name: 'take', type: 'number', default: 50, description: 'Items per page (max 200)' },
-                    { displayName: 'Where', name: 'where', type: 'string', default: '', placeholder: 'Name|Contains|foo', description: 'Filter as Property|Operation|Value; separate several with a semicolon. Operations include Equals, NotEqual, Contains, StartsWith, EndsWith, In, GreaterThan, GreaterThanOrEqual, LessThan and LessThanOrEqual.' },
+                    { displayName: 'Where', name: 'where', type: 'string', default: '', placeholder: 'Name|Contains|foo', description: 'Older text form of Filters, kept for existing workflows. Filter as Property|Operation|Value; separate several with a semicolon. It cannot express a logical operator, so its conditions always combine with And Also.' },
                 ],
             },
 
@@ -430,6 +588,81 @@ export class Approx implements INodeType {
                 description: 'Whether to expand custom pricings into individual rows',
             },
             {
+                displayName: 'Filters',
+                name: 'filters',
+                type: 'fixedCollection',
+                placeholder: 'Add Filter',
+                default: {},
+                typeOptions: { multipleValues: true },
+                displayOptions: { show: { resource: ['project'], operation: ['getMany'] } },
+                description: 'Conditions narrowing the results. They are combined left to right with no grouping, so A Or Else, B And Also, C means (A or B) and C.',
+                options: [
+                    {
+                        displayName: 'Condition',
+                        name: 'condition',
+                        values: [
+                            {
+                                displayName: 'Property',
+                                name: 'property',
+                                type: 'options',
+                                default: 'Name',
+                                description: 'Property to filter on. Set an expression to use a property not listed here.',
+                                options: [
+                                    { name: 'Carriage Percentage', value: 'CarriagePercentage' },
+                                    { name: 'Created At', value: 'CreatedAt' },
+                                    { name: 'Expand Custom Pricings', value: 'ExpandCustomPricings' },
+                                    { name: 'ID', value: 'ID' },
+                                    { name: 'Name', value: 'Name' },
+                                    { name: 'Takeoff Report Template ID', value: 'TakeoffReportTemplateID' },
+                                    { name: 'Takeoff Template ID', value: 'TakeoffTemplateID' },
+                                ],
+                            },
+                            {
+                                displayName: 'Operation',
+                                name: 'operation',
+                                type: 'options',
+                                noDataExpression: true,
+                                default: 'Equals',
+                                description: 'How to compare. Use Contains for substring matching on text.',
+                                options: [
+                                    { name: 'Contains', value: 'Contains' },
+                                    { name: 'Ends With', value: 'EndsWith' },
+                                    { name: 'Equals', value: 'Equals' },
+                                    { name: 'Greater Than', value: 'GreaterThan' },
+                                    { name: 'Greater Than Or Equal', value: 'GreaterThanOrEqual' },
+                                    { name: 'In', value: 'In' },
+                                    { name: 'Less Than', value: 'LessThan' },
+                                    { name: 'Less Than Or Equal', value: 'LessThanOrEqual' },
+                                    { name: 'Not Equal', value: 'NotEqual' },
+                                    { name: 'Starts With', value: 'StartsWith' },
+                                ],
+                            },
+                            {
+                                displayName: 'Value',
+                                name: 'value',
+                                type: 'string',
+                                default: '',
+                                description: 'Value to compare against. Use the literal null to test for no value, and a comma-separated list for In.',
+                            },
+                            {
+                                displayName: 'Logical Operator',
+                                name: 'logicalOperator',
+                                type: 'options',
+                                default: 'AndAlso',
+                                description: 'How this condition joins to the next one. Ignored on the last condition.',
+                                options: [
+                                    { name: 'And', value: 'And' },
+                                    { name: 'And Also', value: 'AndAlso' },
+                                    { name: 'Or', value: 'Or' },
+                                    { name: 'Or Else', value: 'OrElse' },
+                                    { name: 'Xor', value: 'Xor' },
+                                ],
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
                 displayName: 'Query Options',
                 name: 'queryOptions',
                 type: 'collection',
@@ -440,7 +673,7 @@ export class Approx implements INodeType {
                     { displayName: 'Order By', name: 'orderBy', type: 'string', default: '', placeholder: 'Name asc', description: 'Sort as Property, optionally followed by asc or desc. Example: Name desc.' },
                     { displayName: 'Skip', name: 'skip', type: 'number', default: 0, description: 'Number of items to skip' },
                     { displayName: 'Take', name: 'take', type: 'number', default: 50, description: 'Number of items to return (max 200)' },
-                    { displayName: 'Where', name: 'where', type: 'string', default: '', placeholder: 'Name|Contains|foo', description: 'Filter as Property|Operation|Value; separate several with a semicolon. Operations include Equals, NotEqual, Contains, StartsWith, EndsWith, In, GreaterThan, GreaterThanOrEqual, LessThan and LessThanOrEqual.' },
+                    { displayName: 'Where', name: 'where', type: 'string', default: '', placeholder: 'Name|Contains|foo', description: 'Older text form of Filters, kept for existing workflows. Filter as Property|Operation|Value; separate several with a semicolon. It cannot express a logical operator, so its conditions always combine with And Also.' },
                 ],
             },
 
@@ -520,6 +753,83 @@ export class Approx implements INodeType {
                 description: 'Array of property objects. Required keys per item: propertyTypeId. Optional: name, code.',
             },
             {
+                displayName: 'Filters',
+                name: 'filters',
+                type: 'fixedCollection',
+                placeholder: 'Add Filter',
+                default: {},
+                typeOptions: { multipleValues: true },
+                displayOptions: { show: { resource: ['property'], operation: ['getMany'] } },
+                description: 'Conditions narrowing the results. They are combined left to right with no grouping, so A Or Else, B And Also, C means (A or B) and C.',
+                options: [
+                    {
+                        displayName: 'Condition',
+                        name: 'condition',
+                        values: [
+                            {
+                                displayName: 'Property',
+                                name: 'property',
+                                type: 'options',
+                                default: 'Name',
+                                description: 'Property to filter on. Set an expression to use a property not listed here.',
+                                options: [
+                                    { name: 'Code', value: 'Code' },
+                                    { name: 'Created At', value: 'CreatedAt' },
+                                    { name: 'Hash', value: 'Hash' },
+                                    { name: 'ID', value: 'ID' },
+                                    { name: 'Multiplier', value: 'Multiplier' },
+                                    { name: 'Name', value: 'Name' },
+                                    { name: 'Parent ID', value: 'ParentID' },
+                                    { name: 'Project ID', value: 'ProjectID' },
+                                    { name: 'Property Type ID', value: 'PropertyTypeID' },
+                                ],
+                            },
+                            {
+                                displayName: 'Operation',
+                                name: 'operation',
+                                type: 'options',
+                                noDataExpression: true,
+                                default: 'Equals',
+                                description: 'How to compare. Use Contains for substring matching on text.',
+                                options: [
+                                    { name: 'Contains', value: 'Contains' },
+                                    { name: 'Ends With', value: 'EndsWith' },
+                                    { name: 'Equals', value: 'Equals' },
+                                    { name: 'Greater Than', value: 'GreaterThan' },
+                                    { name: 'Greater Than Or Equal', value: 'GreaterThanOrEqual' },
+                                    { name: 'In', value: 'In' },
+                                    { name: 'Less Than', value: 'LessThan' },
+                                    { name: 'Less Than Or Equal', value: 'LessThanOrEqual' },
+                                    { name: 'Not Equal', value: 'NotEqual' },
+                                    { name: 'Starts With', value: 'StartsWith' },
+                                ],
+                            },
+                            {
+                                displayName: 'Value',
+                                name: 'value',
+                                type: 'string',
+                                default: '',
+                                description: 'Value to compare against. Use the literal null to test for no value, and a comma-separated list for In.',
+                            },
+                            {
+                                displayName: 'Logical Operator',
+                                name: 'logicalOperator',
+                                type: 'options',
+                                default: 'AndAlso',
+                                description: 'How this condition joins to the next one. Ignored on the last condition.',
+                                options: [
+                                    { name: 'And', value: 'And' },
+                                    { name: 'And Also', value: 'AndAlso' },
+                                    { name: 'Or', value: 'Or' },
+                                    { name: 'Or Else', value: 'OrElse' },
+                                    { name: 'Xor', value: 'Xor' },
+                                ],
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
                 displayName: 'Query Options',
                 name: 'queryOptions',
                 type: 'collection',
@@ -530,7 +840,7 @@ export class Approx implements INodeType {
                     { displayName: 'Order By', name: 'orderBy', type: 'string', default: '', placeholder: 'Name asc', description: 'Sort as Property, optionally followed by asc or desc. Example: Name desc.' },
                     { displayName: 'Skip', name: 'skip', type: 'number', default: 0, description: 'Number of items to skip' },
                     { displayName: 'Take', name: 'take', type: 'number', default: 50, description: 'Number of items to return (max 200)' },
-                    { displayName: 'Where', name: 'where', type: 'string', default: '', placeholder: 'Name|Contains|foo', description: 'Filter as Property|Operation|Value; separate several with a semicolon. Operations include Equals, NotEqual, Contains, StartsWith, EndsWith, In, GreaterThan, GreaterThanOrEqual, LessThan and LessThanOrEqual.' },
+                    { displayName: 'Where', name: 'where', type: 'string', default: '', placeholder: 'Name|Contains|foo', description: 'Older text form of Filters, kept for existing workflows. Filter as Property|Operation|Value; separate several with a semicolon. It cannot express a logical operator, so its conditions always combine with And Also.' },
                 ],
             },
 
@@ -825,7 +1135,10 @@ export class Approx implements INodeType {
 
                     // ---------- Pricing Library ----------
                 } else if (resource === 'pricingLibrary') {
-                    const qs = buildDqbQuery(this.getNodeParameter('queryOptions', i, {}) as any);
+                    const qs = buildDqbQuery(
+                            this.getNodeParameter('queryOptions', i, {}) as IDataObject,
+                            this.getNodeParameter('filters', i, {}) as IDataObject,
+                        );
                     const res = await approxApiRequest.call(this, 'GET', '/api/integrations/pricing/libraries', undefined, qs);
                     const { items: rows } = unwrapList(res);
                     returnData.push(...rows.map((json) => ({ json, pairedItem: { item: i } })));
@@ -833,7 +1146,10 @@ export class Approx implements INodeType {
                     // ---------- Pricing ----------
                 } else if (resource === 'pricing') {
                     const libraryId = this.getNodeParameter('libraryId', i) as string;
-                    const qs = buildDqbQuery(this.getNodeParameter('queryOptions', i, {}) as any);
+                    const qs = buildDqbQuery(
+                            this.getNodeParameter('queryOptions', i, {}) as IDataObject,
+                            this.getNodeParameter('filters', i, {}) as IDataObject,
+                        );
                     qs.validFrom = this.getNodeParameter('validFrom', i) as string;
                     qs.validTo = this.getNodeParameter('validTo', i) as string;
                     const res = await approxApiRequest.call(
@@ -849,7 +1165,10 @@ export class Approx implements INodeType {
                     // ---------- Project ----------
                 } else if (resource === 'project') {
                     if (operation === 'getMany') {
-                        const qs = buildDqbQuery(this.getNodeParameter('queryOptions', i, {}) as any);
+                        const qs = buildDqbQuery(
+                            this.getNodeParameter('queryOptions', i, {}) as IDataObject,
+                            this.getNodeParameter('filters', i, {}) as IDataObject,
+                        );
                         const res = await approxApiRequest.call(this, 'GET', '/api/integrations/projects', undefined, qs);
                         const { items: rows } = unwrapList(res);
                         returnData.push(...rows.map((json) => ({ json, pairedItem: { item: i } })));
@@ -889,7 +1208,10 @@ export class Approx implements INodeType {
                     const projectId = this.getNodeParameter('projectId', i) as string;
                     const base = `/api/integrations/projects/${projectId}/properties`;
                     if (operation === 'getMany') {
-                        const qs = buildDqbQuery(this.getNodeParameter('queryOptions', i, {}) as any);
+                        const qs = buildDqbQuery(
+                            this.getNodeParameter('queryOptions', i, {}) as IDataObject,
+                            this.getNodeParameter('filters', i, {}) as IDataObject,
+                        );
                         const res = await approxApiRequest.call(this, 'GET', base, undefined, qs);
                         const { items: rows } = unwrapList(res);
                         returnData.push(...rows.map((json) => ({ json, pairedItem: { item: i } })));
