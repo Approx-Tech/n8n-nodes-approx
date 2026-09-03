@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.8.1] - 2026-09-03
+
+### Fixed
+
+- **Errors from the execute loop are always wrapped in a `NodeApiError`.** The 0.6.2 access-denied
+  work added an `instanceof` guard that re-threw an already-resolved `NodeApiError` unchanged; the
+  `@n8n/node-cli` ruleset flags that bare re-throw. The resolved message is now carried over
+  explicitly via the `message` option instead, so Approx's bilingual envelope and the 401/403
+  fallbacks still reach the user rather than n8n's generic status-code text.
+
 ## [0.8.0] - 2026-09-02
 
 Brings the node's filtering up to what the Approx MCP server already does, so the same query can be
