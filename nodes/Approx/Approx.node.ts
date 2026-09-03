@@ -1318,12 +1318,11 @@ export class Approx implements INodeType {
                     continue;
                 }
                 // `approxApiRequest` already resolves Approx's bilingual error envelope (and the
-                // access-denied fallbacks) into a NodeApiError. Re-wrapping one would let n8n
-                // replace that message with its generic status-code text, so pass it through.
-                if (error instanceof NodeApiError || error instanceof NodeOperationError) {
-                    throw error;
-                }
-                throw new NodeApiError(this.getNode(), error as JsonObject);
+                // access-denied fallbacks) into a message. Carry it over explicitly so n8n does
+                // not replace it with its generic status-code text.
+                throw new NodeApiError(this.getNode(), error as JsonObject, {
+                    message: (error as Error).message,
+                });
             }
         }
 
