@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- **`Pricing: Get Many` rows no longer carry `pricingLibrary.validDates`.** This is an Approx API
+  change, not a node change: the node passes rows through as it receives them. The nested
+  `pricingLibrary` now only labels the row (`id`, `createdAt`, `code`, `name`, `libraryType`,
+  `officialLibraryType`), because computing the periods scanned every price of the library on
+  every page. A workflow expression such as `{{ $json.pricingLibrary.validDates }}` now yields
+  nothing. Read the periods from **Pricing Library: Get Many**, which still returns `validDates`
+  for each library.
+- **The Approx API now requires pagination on `Pricing: Get Many`.** A request without `offset`
+  and `count` is rejected with a validation error instead of returning every price of the
+  library. The node already sends both on every list request, so nothing changes for workflows.
+
 ## [0.8.1] - 2026-09-03
 
 ### Fixed
