@@ -561,6 +561,15 @@ export class Approx implements INodeType {
                 description: 'New project name',
             },
             {
+                displayName: 'Authority ID',
+                name: 'authorityId',
+                type: 'string',
+                required: true,
+                default: '',
+                displayOptions: { show: { resource: ['project'], operation: ['update'] } },
+                description: 'Authority (kurum) ID to assign to the project; pass the current one to keep it. Reports generated earlier keep the authority they were generated with.',
+            },
+            {
                 displayName: 'Report Template ID',
                 name: 'reportTemplateId',
                 type: 'string',
@@ -1191,6 +1200,7 @@ export class Approx implements INodeType {
                         const id = this.getNodeParameter('projectId', i) as string;
                         const body = {
                             projectName: this.getNodeParameter('projectName', i) as string,
+                            authorityId: this.getNodeParameter('authorityId', i) as string,
                             reportTemplateId: this.getNodeParameter('reportTemplateId', i) as string,
                             carriagePercentage: this.getNodeParameter('carriagePercentage', i) as number,
                             expandCustomPricings: this.getNodeParameter('expandCustomPricings', i, false) as boolean,
