@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
+- **`Project: Update` now takes an `Authority ID`** (required). The Approx API replaces every
+  value on update and now includes the authority (kurum), so a workflow that updates a project
+  must pass the authority it wants, the current one to keep it. Reports generated before the
+  change keep the authority they were generated with.
 - **`Pricing: Get Many` rows no longer carry `pricingLibrary.validDates`.** This is an Approx API
   change, not a node change: the node passes rows through as it receives them. The nested
   `pricingLibrary` now only labels the row (`id`, `createdAt`, `code`, `name`, `libraryType`,
