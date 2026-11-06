@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-11-06
+
+### Fixed
+
+- The `Authority ID` field description on `Project: Update` is now fully in English, matching
+  the `Project: Create` field.
+
 ## [0.9.0] - 2026-11-05
 
 ### Changed
