@@ -567,7 +567,7 @@ export class Approx implements INodeType {
                 required: true,
                 default: '',
                 displayOptions: { show: { resource: ['project'], operation: ['update'] } },
-                description: 'Authority (kurum) ID to assign to the project; pass the current one to keep it. Reports generated earlier keep the authority they were generated with.',
+                description: 'Authority (pricing authority) ID to assign to the project; pass the current one to keep it. Reports generated earlier keep the authority they were generated with.',
             },
             {
                 displayName: 'Report Template ID',
