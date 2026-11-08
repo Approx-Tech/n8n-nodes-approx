@@ -523,7 +523,7 @@ export class Approx implements INodeType {
                 default: '',
                 placeholder: '2026-01-01',
                 displayOptions: { show: { resource: ['project'], operation: ['create'] } },
-                description: 'Start of the project pricing period (pozlama dönemi), YYYY-MM-DD; only pricings valid within the period are offered to the project',
+                description: 'Start of the project pricing period, YYYY-MM-DD; only pricings valid within the period are offered to the project',
             },
             {
                 displayName: 'Pricing Period End',
