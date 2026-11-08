@@ -11,7 +11,9 @@ function parseDateOnly(value: string): Date | undefined {
     const year = Number(match[1]);
     const month = Number(match[2]);
     const day = Number(match[3]);
-    const date = new Date(Date.UTC(year, month - 1, day));
+    // Date.UTC maps years 0-99 to 1900-1999; setting the year explicitly keeps every four-digit year as written.
+    const date = new Date(Date.UTC(2000, month - 1, day));
+    date.setUTCFullYear(year, month - 1, day);
     const roundTrips =
         date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day;
     return roundTrips ? date : undefined;
