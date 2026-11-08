@@ -10,6 +10,7 @@ import {
 } from 'n8n-workflow';
 
 import { approxApiRequest, buildDqbQuery, unwrapList } from '../../utils/GenericFunctions';
+import { pricingPeriodError } from '../../utils/pricingPeriod';
 
 export class Approx implements INodeType {
     description: INodeTypeDescription = {
@@ -514,6 +515,26 @@ export class Approx implements INodeType {
                 default: '',
                 displayOptions: { show: { resource: ['project'], operation: ['create'] } },
                 description: 'Authority (pricing authority) ID to associate with the project',
+            },
+            {
+                displayName: 'Pricing Period Start',
+                name: 'pricingPeriodStart',
+                type: 'string',
+                required: true,
+                default: '',
+                placeholder: '2026-01-01',
+                displayOptions: { show: { resource: ['project'], operation: ['create'] } },
+                description: 'Start of the project pricing period, YYYY-MM-DD; only pricings valid within the period are offered to the project',
+            },
+            {
+                displayName: 'Pricing Period End',
+                name: 'pricingPeriodEnd',
+                type: 'string',
+                required: true,
+                default: '',
+                placeholder: '2026-12-31',
+                displayOptions: { show: { resource: ['project'], operation: ['create'] } },
+                description: 'End of the project pricing period, YYYY-MM-DD; not before the start and in the same calendar year',
             },
             {
                 displayName: 'Takeoff Template ID',
@@ -1186,9 +1207,18 @@ export class Approx implements INodeType {
                         const res = await approxApiRequest.call(this, 'GET', `/api/integrations/projects/${id}`);
                         returnData.push({ json: res, pairedItem: { item: i } });
                     } else if (operation === 'create') {
+                        const pricingPeriodStart = (this.getNodeParameter('pricingPeriodStart', i) as string).trim();
+                        const pricingPeriodEnd = (this.getNodeParameter('pricingPeriodEnd', i) as string).trim();
+                        // The same rules the API applies, checked here so the workflow gets a clear local error.
+                        const periodError = pricingPeriodError(pricingPeriodStart, pricingPeriodEnd);
+                        if (periodError) {
+                            throw new NodeOperationError(this.getNode(), periodError, { itemIndex: i });
+                        }
                         const body = {
                             projectName: this.getNodeParameter('projectName', i) as string,
                             authorityId: this.getNodeParameter('authorityId', i) as string,
+                            pricingPeriodStart,
+                            pricingPeriodEnd,
                             takeoffTemplateId: this.getNodeParameter('takeoffTemplateId', i) as string,
                             reportTemplateId: this.getNodeParameter('reportTemplateId', i) as string,
                             carriagePercentage: this.getNodeParameter('carriagePercentage', i) as number,

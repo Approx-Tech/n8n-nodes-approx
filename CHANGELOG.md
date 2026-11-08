@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-11-06
+
+### Changed
+
+- **`Project: Create` now takes a `Pricing Period Start` and `Pricing Period End`** (required, YYYY-MM-DD).
+  The Approx API stores one pricing period per project at creation — start not after end,
+  inside one calendar year — and offers the project only pricings valid within it. The node checks
+  the format, the order and the calendar year before the request, so an invalid period fails locally.
+
 ## [0.9.1] - 2026-11-06
 
 ### Fixed
@@ -18,7 +27,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Changed
 
 - **`Project: Update` now takes an `Authority ID`** (required). The Approx API replaces every
-  value on update and now includes the authority (kurum), so a workflow that updates a project
+  value on update and now includes the authority, so a workflow that updates a project
   must pass the authority it wants, the current one to keep it. Reports generated before the
   change keep the authority they were generated with.
 - **`Pricing: Get Many` rows no longer carry `pricingLibrary.validDates`.** This is an Approx API
