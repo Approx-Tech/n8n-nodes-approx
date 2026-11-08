@@ -12,7 +12,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - **`Project: Create` now takes a `Pricing Period Start` and `Pricing Period End`** (required, YYYY-MM-DD).
   The Approx API stores one pricing period per project at creation — start not after end,
-  inside one calendar year — and offers the project only pricings valid within it.
+  inside one calendar year — and offers the project only pricings valid within it. The node checks
+  the format, the order and the calendar year before the request, so an invalid period fails locally.
 
 ## [0.9.1] - 2026-11-06
 

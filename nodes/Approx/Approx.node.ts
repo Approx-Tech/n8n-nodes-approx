@@ -10,6 +10,7 @@ import {
 } from 'n8n-workflow';
 
 import { approxApiRequest, buildDqbQuery, unwrapList } from '../../utils/GenericFunctions';
+import { pricingPeriodError } from '../../utils/pricingPeriod';
 
 export class Approx implements INodeType {
     description: INodeTypeDescription = {
@@ -1206,11 +1207,18 @@ export class Approx implements INodeType {
                         const res = await approxApiRequest.call(this, 'GET', `/api/integrations/projects/${id}`);
                         returnData.push({ json: res, pairedItem: { item: i } });
                     } else if (operation === 'create') {
+                        const pricingPeriodStart = (this.getNodeParameter('pricingPeriodStart', i) as string).trim();
+                        const pricingPeriodEnd = (this.getNodeParameter('pricingPeriodEnd', i) as string).trim();
+                        // The same rules the API applies, checked here so the workflow gets a clear local error.
+                        const periodError = pricingPeriodError(pricingPeriodStart, pricingPeriodEnd);
+                        if (periodError) {
+                            throw new NodeOperationError(this.getNode(), periodError, { itemIndex: i });
+                        }
                         const body = {
                             projectName: this.getNodeParameter('projectName', i) as string,
                             authorityId: this.getNodeParameter('authorityId', i) as string,
-                            pricingPeriodStart: this.getNodeParameter('pricingPeriodStart', i) as string,
-                            pricingPeriodEnd: this.getNodeParameter('pricingPeriodEnd', i) as string,
+                            pricingPeriodStart,
+                            pricingPeriodEnd,
                             takeoffTemplateId: this.getNodeParameter('takeoffTemplateId', i) as string,
                             reportTemplateId: this.getNodeParameter('reportTemplateId', i) as string,
                             carriagePercentage: this.getNodeParameter('carriagePercentage', i) as number,
