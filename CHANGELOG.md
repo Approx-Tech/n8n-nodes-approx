@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-11-12
+
+### Changed
+
+- **`Original File: Upload Many` and `Static File: Upload Many` report the outcome per file.** The
+  Approx API now stores the acceptable files of a batch and refuses the others on their own rows
+  with a `200` — a file over 1 GB (refused while it is received, never buffered beyond the limit),
+  a static file that is not a report attachment (`.pdf`, `.docx`, `.xlsx`, `.xls`), or a file
+  dropped by storage. The node used to answer `success: true` with `count` = files sent whatever
+  the API did with them. It now answers `success` (true only when every file was stored), `count`
+  (the files stored), `stored` (`id` of the new row and `name`) and `failed` (`index` in the batch,
+  `name`, `error` in English and `errorTR`). The raw `response` field is gone: its content is in
+  `stored` and `failed`.
+
 ## [0.10.0] - 2026-11-06
 
 ### Changed
