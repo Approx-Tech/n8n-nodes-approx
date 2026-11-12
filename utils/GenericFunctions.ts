@@ -128,5 +128,57 @@ export function unwrapList(payload: any): { items: any[]; totalCount: number } {
     return { items, totalCount };
 }
 
+export interface UploadOutcome {
+    /** The stored files, each with the id of its new row. */
+    stored: Array<{ id: string; name: string }>;
+    /** The refused files by their position in the request, with the reason. */
+    failed: Array<{ index: number; name: string; error: string; errorTR: string }>;
+}
+
+/**
+ * Reads the per-file answer of the `:bulk` upload endpoints:
+ * `{ stored: [{ id, name }], failed: [{ index, name, errorEN, errorTR }] }`.
+ * The API stores the acceptable files and refuses the others on their rows (over 1 GB, not a
+ * report attachment, dropped by storage) with a 200, so a batch is not simply a success.
+ * The multipart request is sent with `json: false`, so the body arrives as text; property names
+ * are matched regardless of case. A body without the per-file shape (an older API answering an
+ * empty 200) counts every file sent as stored, as the node assumed before.
+ */
+export function readUploadOutcome(payload: unknown, sentFileNames: string[]): UploadOutcome {
+    let body: unknown = payload;
+    if (typeof body === 'string') {
+        try {
+            body = body.trim() === '' ? undefined : JSON.parse(body);
+        } catch {
+            body = undefined;
+        }
+    }
+    if (Buffer.isBuffer(body)) {
+        return readUploadOutcome(body.toString('utf8'), sentFileNames);
+    }
+
+    const read = (obj: unknown, key: string): unknown => {
+        if (!obj || typeof obj !== 'object') return undefined;
+        const match = Object.keys(obj as object).find((k) => k.toLowerCase() === key.toLowerCase());
+        return match === undefined ? undefined : (obj as Record<string, unknown>)[match];
+    };
+
+    const stored = read(body, 'stored');
+    if (!Array.isArray(stored)) {
+        return { stored: sentFileNames.map((name) => ({ id: '', name })), failed: [] };
+    }
+    const failed = read(body, 'failed');
+
+    return {
+        stored: stored.map((row) => ({ id: String(read(row, 'id') ?? ''), name: String(read(row, 'name') ?? '') })),
+        failed: (Array.isArray(failed) ? failed : []).map((row) => ({
+            index: Number(read(row, 'index') ?? -1),
+            name: String(read(row, 'name') ?? ''),
+            error: String(read(row, 'errorEN') ?? read(row, 'errorTR') ?? ''),
+            errorTR: String(read(row, 'errorTR') ?? read(row, 'errorEN') ?? ''),
+        })),
+    };
+}
+
 // Kept re-exported so existing imports from GenericFunctions keep working.
 export { buildDqbQuery, MAX_TAKE } from './dqb';

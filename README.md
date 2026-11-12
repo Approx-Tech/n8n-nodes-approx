@@ -357,6 +357,32 @@ the id n8n assigns to your saved Approx OAuth2 API credential.
 …plus a `binary.report` field containing the actual ZIP bytes (default field
 name; configurable via **Put Output File in Field**).
 
+### `Original File: Upload Many` / `Static File: Upload Many`
+
+The API stores the acceptable files of a batch and refuses the others on their own rows, so the
+outcome is per file: `success` is true only when every file was stored, `count` is the number
+stored, `stored` carries the id of each new row, and `failed` names each refused file by its
+position in the batch with the reason (over 1 GB; for static files, not a `.pdf` / `.docx` /
+`.xlsx` / `.xls`; dropped by storage).
+
+```json
+{
+  "success": false,
+  "count": 1,
+  "stored": [
+    { "id": "3c1f0a52-7b7e-4f7d-9a0e-5d2c6b8e1f44", "name": "plan.dwg" }
+  ],
+  "failed": [
+    {
+      "index": 1,
+      "name": "scan.dwg",
+      "error": "scan.dwg exceeds the 1 GB limit.",
+      "errorTR": "scan.dwg 1 GB sınırını aşıyor."
+    }
+  ]
+}
+```
+
 ### `Pricing Library: Get Many` (one item)
 
 ```json

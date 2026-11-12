@@ -9,7 +9,7 @@ import {
     NodeOperationError,
 } from 'n8n-workflow';
 
-import { approxApiRequest, buildDqbQuery, unwrapList } from '../../utils/GenericFunctions';
+import { approxApiRequest, buildDqbQuery, readUploadOutcome, unwrapList } from '../../utils/GenericFunctions';
 import { pricingPeriodError } from '../../utils/pricingPeriod';
 
 export class Approx implements INodeType {
@@ -1160,7 +1160,13 @@ export class Approx implements INodeType {
                             {},
                             { body: formData as any, json: false, headers: { Accept: 'application/json' } },
                         );
-                        returnData.push({ json: { success: true, count: files.length, response: res ?? null }, pairedItem: { item: i } });
+                        // The API stores the acceptable files and refuses the others on their rows (over 1 GB,
+                        // not a report attachment, dropped by storage) with a 200, so the outcome is per file.
+                        const { stored, failed } = readUploadOutcome(res, files.map((f) => f.options.filename));
+                        returnData.push({
+                            json: { success: failed.length === 0, count: stored.length, stored, failed },
+                            pairedItem: { item: i },
+                        });
                     }
 
                     // ---------- Pricing Library ----------
