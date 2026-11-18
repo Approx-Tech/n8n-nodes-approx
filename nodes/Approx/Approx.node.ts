@@ -67,9 +67,23 @@ export class Approx implements INodeType {
                     { name: 'Create', value: 'create', action: 'Create an authority', description: 'Create a new authority' },
                     { name: 'Delete', value: 'delete', action: 'Delete an authority', description: 'Delete an authority by ID' },
                     { name: 'Get', value: 'get', action: 'Get an authority', description: 'Retrieve an authority by ID' },
-                    { name: 'Get Many', value: 'getMany', action: 'Get many authorities', description: 'List all authorities for the tenant' },
+                    { name: 'Get Many', value: 'getMany', action: 'Get many authorities', description: 'List authorities for the tenant, 50 per page (paged read with filters and sort)' },
                     { name: 'Update Logo', value: 'updateLogo', action: 'Update an authority logo', description: 'Update an authority logo (Base64)' },
                     { name: 'Update Name', value: 'updateName', action: 'Update an authority name', description: 'Update an authority name' },
+                ],
+            },
+            {
+                displayName: 'Query Options',
+                name: 'queryOptions',
+                type: 'collection',
+                placeholder: 'Add option',
+                default: {},
+                displayOptions: { show: { resource: ['authority'], operation: ['getMany'] } },
+                options: [
+                    { displayName: 'Order By', name: 'orderBy', type: 'string', default: 'Name', placeholder: 'Name asc', description: 'Sort as Property, optionally followed by asc or desc. Properties: ID, CreatedAt, Name, ProjectCount, LastChangedAt.' },
+                    { displayName: 'Skip', name: 'skip', type: 'number', default: 0, description: 'Number of authorities to skip' },
+                    { displayName: 'Take', name: 'take', type: 'number', default: 50, description: 'Number of authorities to return (max 50)' },
+                    { displayName: 'Where', name: 'where', type: 'string', default: '', placeholder: 'Name|Contains|belediye', description: 'Filter as Property|Operation|Value; separate several with a semicolon' },
                 ],
             },
             {
@@ -1050,7 +1064,9 @@ export class Approx implements INodeType {
                 // ---------- Authority ----------
                 if (resource === 'authority') {
                     if (operation === 'getMany') {
-                        const res = await approxApiRequest.call(this, 'GET', '/api/integrations/authorities');
+                        // The paged read (US-W12-021): the dqb query from the Query Options, 50 per page at most.
+                        const qs = buildDqbQuery(this.getNodeParameter('queryOptions', i, {}) as IDataObject, {});
+                        const res = await approxApiRequest.call(this, 'GET', '/api/integrations/authorities', undefined, qs);
                         const { items: rows } = unwrapList(res);
                         returnData.push(...rows.map((json) => ({ json, pairedItem: { item: i } })));
                     } else if (operation === 'get') {
