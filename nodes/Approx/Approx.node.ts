@@ -83,7 +83,7 @@ export class Approx implements INodeType {
                     { displayName: 'Order By', name: 'orderBy', type: 'string', default: 'Name', placeholder: 'Name asc', description: 'Sort as Property, optionally followed by asc or desc. Properties: ID, CreatedAt, Name, ProjectCount, LastChangedAt.' },
                     { displayName: 'Skip', name: 'skip', type: 'number', default: 0, description: 'Number of authorities to skip' },
                     { displayName: 'Take', name: 'take', type: 'number', default: 50, description: 'Number of authorities to return (max 50)' },
-                    { displayName: 'Where', name: 'where', type: 'string', default: '', placeholder: 'Name|Contains|belediye', description: 'Filter as Property|Operation|Value; separate several with a semicolon' },
+                    { displayName: 'Where', name: 'where', type: 'string', default: '', placeholder: 'Name|Contains|Municipality', description: 'Filter as Property|Operation|Value; separate several with a semicolon' },
                 ],
             },
             {
