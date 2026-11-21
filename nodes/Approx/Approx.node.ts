@@ -538,7 +538,7 @@ export class Approx implements INodeType {
                 default: '',
                 placeholder: '2026-01-01',
                 displayOptions: { show: { resource: ['project'], operation: ['create'] } },
-                description: 'Start of the project pricing period, YYYY-MM-DD; only pricings valid within the period are offered to the project',
+                description: 'Start of the project pricing period, YYYY-MM-DD. Together with the end it must be one of the periods the organization\'s pricing libraries hold for that year (a validDates entry of Pricing Library: Get Many); any other range is refused by the API. Only pricings valid within the period are offered to the project.',
             },
             {
                 displayName: 'Pricing Period End',
@@ -548,7 +548,7 @@ export class Approx implements INodeType {
                 default: '',
                 placeholder: '2026-12-31',
                 displayOptions: { show: { resource: ['project'], operation: ['create'] } },
-                description: 'End of the project pricing period, YYYY-MM-DD; not before the start and in the same calendar year',
+                description: 'End of the project pricing period, YYYY-MM-DD; not before the start, in the same calendar year, and paired with the start as one of the pricing libraries\' periods (see Pricing Period Start)',
             },
             {
                 displayName: 'Takeoff Template ID',
