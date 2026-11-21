@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- **`Authority: Get Many` rows carry `hasLogo` instead of `base64Logo`.** The Approx API no longer
+  inlines every authority's logo in the list; `Authority: Get` keeps `base64Logo`. A workflow that read
+  the logo from the list must read it from `Authority: Get` instead.
+
 ## [0.12.0] - 2026-11-21
 
 ### Changed

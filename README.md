@@ -408,9 +408,14 @@ position in the batch with the reason (over 1 GB; for static files, not a `.pdf`
 {
   "id": "0b8e5d59-3f72-4d4a-9e0d-4f7e6f1c2a91",
   "name": "Çevre, Şehircilik ve İklim Değişikliği Bakanlığı",
+  "hasLogo": true,
+  "projectCount": 3,
   "createdAt": "2025-01-12T10:00:00Z"
 }
 ```
+
+A list row says whether the authority has a logo (`hasLogo`) and never carries the image itself;
+`Authority: Get` returns the logo as `base64Logo`.
 
 ### `Takeoff Template: Get Many` (one item)
 
