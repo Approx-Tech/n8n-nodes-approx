@@ -34,27 +34,25 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 
-      - name: Check if tag already exists
-        id: tag_exists
+      # The registry, not a git tag, says whether the version is out: 0.10.0 and 0.11.0 were published without a tag,
+      # so the tag check let a docs-only push to main try to publish 0.11.0 again (npm refused). Every later step is
+      # skipped when the version is already published — a step's `exit 0` never stopped the job.
+      - name: Check if version is already published
+        id: published
         run: |
-          TAG="${{ steps.package.outputs.tag }}"
+          PKG=$(node -p "require('./package.json').name")
+          VERSION="${{ steps.package.outputs.version }}"
 
-          if git rev-parse "$TAG" >/dev/null 2>&1; then
+          if npm view "$PKG@$VERSION" version >/dev/null 2>&1; then
             echo "exists=true" >> "$GITHUB_OUTPUT"
-            echo "Tag $TAG already exists."
+            echo "$PKG@$VERSION is already on npm — skipping publish."
           else
             echo "exists=false" >> "$GITHUB_OUTPUT"
-            echo "Tag $TAG does not exist."
+            echo "$PKG@$VERSION is not on npm — publishing."
           fi
 
-      - name: Stop if version was already published
-        if: steps.tag_exists.outputs.exists == 'true'
-        run: |
-          echo "Version ${{ steps.package.outputs.version }} already has tag ${{ steps.package.outputs.tag }}."
-          echo "Skipping publish."
-          exit 0
-
       - name: Setup Node.js
+        if: steps.published.outputs.exists == 'false'
         uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -62,28 +60,38 @@ jobs:
           cache: 'npm'
 
       - name: Upgrade npm
+        if: steps.published.outputs.exists == 'false'
         run: npm install -g npm@latest
 
       - name: Install dependencies
+        if: steps.published.outputs.exists == 'false'
         run: npm ci
 
       - name: Build
+        if: steps.published.outputs.exists == 'false'
         run: npm run build
 
       - name: Publish to npm
+        if: steps.published.outputs.exists == 'false'
         run: npm publish --provenance --access public
 
       - name: Create git tag
+        if: steps.published.outputs.exists == 'false'
         run: |
           TAG="${{ steps.package.outputs.tag }}"
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git tag -a "$TAG" -m "Release $TAG"
-          git push origin "$TAG"
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists."
+          else
+            git tag -a "$TAG" -m "Release $TAG"
+            git push origin "$TAG"
+          fi
 
       - name: Create GitHub Release
+        if: steps.published.outputs.exists == 'false'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.package.outputs.tag }}
