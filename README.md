@@ -317,9 +317,17 @@ the id n8n assigns to your saved Approx OAuth2 API credential.
   "takeoffTemplateId": "b3d20b6c-7d6f-4f02-9c54-3c1c1c5a4e22",
   "reportTemplateId": "f1b9c8e0-aa11-4af0-9c5d-5a2f3b4c6d70",
   "carriagePercentage": 0.04,
-  "expandCustomPricings": false
+  "expandCustomPricings": false,
+  "pricingPeriodStart": "2026-01-01",
+  "pricingPeriodEnd": "2026-12-31"
 }
 ```
+
+The pricing period (`Pricing Period Start` / `End`, `YYYY-MM-DD`) must be one of the periods the
+organization's pricing libraries hold for that year: pick a `validDates` entry from
+`Pricing Library: Get Many`. A range no library holds is refused by the API with
+`The period must be one of the books' ‹year› periods`; the node's own check only covers the date
+format, the order and the single calendar year.
 
 ### `Report: Create`
 

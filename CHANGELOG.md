@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- **`Project: Create` — the pricing period must be one of the pricing libraries' periods.** The
+  Approx API now refuses a `Pricing Period Start` / `End` pair that no library of the organization
+  holds for that year (`The period must be one of the books' ‹year› periods`, HTTP 400). The field
+  descriptions and the README point to `Pricing Library: Get Many`'s `validDates` for the valid
+  pairs; the node's own pre-check (format, order, one calendar year) is unchanged.
+
 ## [0.11.0] - 2026-11-12
 
 ### Changed
